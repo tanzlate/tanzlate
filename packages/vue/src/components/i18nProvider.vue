@@ -5,10 +5,8 @@
 </template>
 
 <script setup lang="ts">
-import { useI18nContext } from '@/composables/context';
-import { i18nKey } from '@/types/i18n-key';
-import { Createi18nConfigParams } from 'i18next-compose';
-import { computed, provide } from 'vue';
+import { setupI18nContext } from '@/composables/context';
+import { Createi18nConfigParams, useCoreContext } from '@tanzlate/step';
 
 const i18nextConfigDefault: Createi18nConfigParams = {
   fallbackLng: 'en',
@@ -45,13 +43,14 @@ const props = defineProps<{
   i18nextConfig?: Createi18nConfigParams;
 }>();
 
-const config = computed(() => {
-  return props.i18nextConfig ?? i18nextConfigDefault;
-});
+// provide + onUnmounted MUST happen before the top-level await below
+const resolve = setupI18nContext();
 
-const { initContext, context } = useI18nContext();
-provide(i18nKey, context);
-await initContext(config.value);
+const ctx = await useCoreContext({
+  config: props.i18nextConfig ?? i18nextConfigDefault,
+  ssr: false,
+});
+resolve(ctx);
 </script>
 
 <style scoped></style>

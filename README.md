@@ -1,13 +1,13 @@
-# i18next-compose
+# tanzlate
 
-![NPM Package Version](https://img.shields.io/npm/v/i18next-compose?color=519ea9)
+![NPM Package Version](https://img.shields.io/npm/v/@tanzlate/step?color=519ea9)
 
-One of the biggest challenge in Engineering is to ensure that everyone is on the same page.
-This can relate to the codebase, the documentation, etc. It's often related as to be on the same **boat**.
+One of the biggest challenges in Engineering is to ensure that everyone is on the same page.
+This can relate to the codebase, the documentation, etc. It's often related to being on the same **boat**.
 
 ## Motivation
 
-Translation processes go beyond only Engineering, they can involve multiple teams and require to synchronize the knowledge, in a common language
+Translation processes go beyond only Engineering — they can involve multiple teams and require synchronizing knowledge in a common language.
 They can involve:
 
 - **Developers**: to implement the translation process
@@ -15,55 +15,54 @@ They can involve:
 - **Content Writers**: to validate and correct the translations
 - **Designers**: to ensure that the translations are correctly displayed
 - **Product Owners/Managers**: to test the final result
-  etc.
 
-This Library aims to provide a simple and efficient way to manage translations in a Vue or Nuxt project.
+This library aims to provide a simple and efficient way to manage translations in a Vue or Nuxt project.
 
 ## Installation
 
 :::code-group
 
 ```bash [npm]
-npm install i18next-compose
+npm install @tanzlate/step
 ```
 
 ```bash [yarn]
-yarn add i18next-compose
+yarn add @tanzlate/step
 ```
 
 ```bash [pnpm]
-pnpm add i18next-compose
+pnpm add @tanzlate/step
 ```
 
 :::
 
 ## Usage
 
-There are different ways to use i18next-compose.
+There are different ways to use tanzlate.
 
 1. You can initialize the configuration in standalone mode:
 
-```js
-import { Createi18nConfigParams, i18nConfigInit } from 'i18next-compose';
+```ts
+import { Createi18nConfigParams, useCoreContext } from '@tanzlate/step';
 
-function initi18nextCompose()
- const i18nParams: Createi18nConfigParams = {
+async function initTanzlate() {
+  const i18nParams: Createi18nConfigParams = {
     namespace: 'my_namespace',
     fallbackLng: 'en',
     lng: 'en',
     supportedLanguages: ['en', 'fr', 'de'],
   };
 
-  const i18next = await i18nConfigInit(i18nParams);
+  const ctx = await useCoreContext({ config: i18nParams });
 
-  return i18next;
+  return ctx;
 }
 ```
 
-Behind the scenes, this will create a new i18next instance with the provided configuration. You can then use this instance to translate your content using the i18next helper functions.
+Behind the scenes, this creates a new i18next instance with the provided configuration. You can then use this instance to translate your content using the tanzlate helper functions.
 
 :::tip
-i18next-compose doest not inject global variable such as `$t` or `$i18next`. It means to be used in a modular way.
+tanzlate does not inject global variables such as `$t` or `$i18next`. It is designed to be used in a modular way.
 :::
 
 2. You can directly create a context that will:
@@ -75,7 +74,7 @@ This context can then be used in different frameworks (Vue, React) as a provider
 
 # Features
 
-## Translations parsing
+## Translations Parsing
 
 Support for rendering complex translations that involve components and values in one single translation string.
 
@@ -85,7 +84,6 @@ Example:
 
 ```html
 <template>
-  <!-- using a render function, this extra div could potentially be avoided -->
   <div>
     Hallo und <NuxtLink :to="link1">Wilkommen zurück</NuxtLink>! Viel Spaß
     <NuxtLink2 :to="link2">mit unserer <SelfClosingComponent :prop="nameOfProp" /> App</NuxtLink2>
@@ -101,7 +99,7 @@ Example:
 
 ```vue
 <RtTranslate
-  :rt-translate="rtTranslate"
+  :rt-translate="cT"
   i18n-key="name_of_key"
   :components="{
     NuxtLink: { to: someLocation },
@@ -114,13 +112,13 @@ Example:
 
 ### Explanation
 
-Parse a given translation string and return an array of strings and objects e.g. for a key
+Parse a given translation string and return an array of strings and objects. For example, for the key:
 
 ```json
 "Wunderbar! <NuxtLink>The customer <strong>{{ customer.name }}</strong></NuxtLink> hat den <NuxtLink-2>Kurs</NuxtLink-2> erfolgreich absolviert."
 ```
 
-Will return
+Will return:
 
 ```ts
 [
@@ -144,10 +142,10 @@ Will return
 ];
 ```
 
-## Comparison with Other Icon Strategies TODO:
+## Comparison
 
-| Feature / Approach                               | Translators                                  | Content Writers | Developers          | Other contributors (non-developer) |
-| ------------------------------------------------ | -------------------------------------------- | --------------- | ------------------- | ---------------------------------- |
-| **Strong convention on the naming**              | ✅                                           | ✅              | ✅                  | ✅ Minimal                         |
-| **Several namespace levels**                     | ~                                            | ✅              | ✅                  | `<svg>` (clean)                    |
-| **Full Interpolation of Components / HTML tags** | Translators - Readability for non-developers | ✅ Full control | ✅ Flexible via CSS | ✅ CSS variables                   |
+| Feature / Approach                               | Translators                 | Content Writers | Developers          |
+| ------------------------------------------------ | --------------------------- | --------------- | ------------------- |
+| **Strong convention on the naming**              | ✅                          | ✅              | ✅                  |
+| **Several namespace levels**                     | ~                           | ✅              | ✅                  |
+| **Full Interpolation of Components / HTML tags** | Readable for non-developers | ✅ Full control | ✅ Flexible via CSS |

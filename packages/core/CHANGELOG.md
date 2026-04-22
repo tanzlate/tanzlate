@@ -1,5 +1,15 @@
 # core
 
+## 0.2.0
+
+### Minor Changes
+
+- 04d4919: Fix all package .mjs
+
+### Patch Changes
+
+- 9a1e52f: Implement interpolation of Vue Component self-closing tags first working version \n Fix lint and cleanup / document Translate component
+
 ## 0.1.4
 
 ### Patch Changes

@@ -7,9 +7,19 @@ import {
   TagObject,
 } from '@/utils/parse-translation';
 import { TOptions } from 'i18next';
-import { cTFunc } from 'i18next-compose';
+import { cTFunc } from '@tanzlate/step';
 import { isString } from 'unreadable-typescript';
-import { computed, defineAsyncComponent, defineComponent, h, PropType, VNode } from 'vue';
+import {
+  computed,
+  defineAsyncComponent,
+  defineComponent,
+  defineEmits,
+  EmitFn,
+  h,
+  PropType,
+  useAttrs,
+  VNode,
+} from 'vue';
 import { resolveRegistered } from './component-registry';
 
 type ComponentPropValue =
@@ -21,7 +31,9 @@ type ComponentPropValue =
   | object
   | Date
   | Array<string | number | boolean | null | undefined | object | Date | symbol>
-  | symbol;
+  | symbol
+  // onClick, onMouseover, etc.
+  | EmitFn<any>;
 
 type ComponentsProps = {
   [name: string]: { [key: string]: ComponentPropValue } | null;
@@ -104,12 +116,16 @@ export default defineComponent({
       required: false,
     },
   },
-  setup(props) {
+  setup(props, { emit, attrs }) {
+    console.log('📟 - attrs → ', attrs)
+    if (attrs && attrs.onClick) {
+      defineEmits<{ click: (e: Event) => void }>();
+    }
     // 1. Get current translation
     const translationValue = computed(() => {
       const { translationValue, cTranslate, i18nKey, values } = props;
       if (translationValue) {
-        return translationValue;
+        // return translationValue;
       }
 
       if (values) {
@@ -118,6 +134,7 @@ export default defineComponent({
 
       return cTranslate(i18nKey);
     });
+    console.log('📟 - translationValue → ', translationValue)
 
     /**
      * 2. Test if the translation string contains component tags
@@ -146,7 +163,9 @@ export default defineComponent({
         return [];
       }
       if (Array.isArray(content)) {
+        console.log('📟 - item → ', content);
         return content.map((item) => {
+          console.log('📟 - item → ', item);
           if (isString(item) || typeof item === 'string') {
             return item;
           }
@@ -154,6 +173,9 @@ export default defineComponent({
           return renderComponent(item);
         });
       }
+      defineEmits<{ click: (e: Event) => void }>();
+      console.log('onClick', emit('click'));
+      console.log('📟 - content → ', content);
       return [content];
     }
 
@@ -167,7 +189,28 @@ export default defineComponent({
       const original = element.tag; // e.g. "ColoredLabel-1" or "strong"
       const fileName = removeNumberSuffix(original); // "ColoredLabel"
 
-      const componentProps = props.components[original] ?? undefined;
+      let componentProps = props.components[original];
+      console.log('📟 - componentProps → ', componentProps);
+      let componentEvents: { [key: string]: Function } = {};
+      console.log('📟 - componentProps.onClick → ', componentProps && componentProps.click);
+      console.log('📟 - componentProps.onClick → ', componentProps && componentProps.onclick);
+      console.log('📟 - componentProps.onClick → ', componentProps && componentProps['@click']);
+      console.log('📟 - slots → ', componentProps && componentProps.slots);
+      console.log('📟 - attrs → ', componentProps && !!componentProps.emit && componentProps.emit);
+      console.log('📟 - emits → ', emit('click'));
+      if (!componentProps) {
+        componentProps = null;
+      } else if (componentProps.onClick) {
+        console.log('clicl', emit('click'));
+        console.log('📟 - onClick → ', componentProps.onClick);
+        componentEvents = {
+          onClick: (e: Event) => {
+            console.log('trigger');
+            emit('click', e);
+          },
+        };
+      }
+      componentProps = props.components[original];
 
       // If the component content contains other nested tags, we recursively render them
       const elementContent = normalizeChildren(element.content) || [];
@@ -187,6 +230,9 @@ export default defineComponent({
         return h(htmlTag, componentProps, elementContent);
       }
 
+      const attrs = useAttrs();
+      console.log('📟 - attrs → ', attrs);
+
       // TODO: ?
       // Extract event listeners (e.g., @click)
       // const eventListeners = props?.value.onClick || {};
@@ -194,8 +240,7 @@ export default defineComponent({
 
       return h(
         ElementComponent,
-        componentProps,
-        // attrs,
+        { ...componentProps, ...componentEvents },
         // on: eventListeners,
         elementContent,
       );

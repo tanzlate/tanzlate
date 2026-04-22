@@ -56,7 +56,7 @@ function createI18nAppInstance(): I18nApp {
   const originalInit = base.init;
 
   const extended = Object.assign(base, {
-    async initCompose(this: I18nApp, cfg: Createi18nConfigParams): Promise<I18nApp> {
+    async initTanz(this: I18nApp, cfg: Createi18nConfigParams): Promise<I18nApp> {
       await originalInit.call(this, toInitOptions(cfg));
       return this;
     },

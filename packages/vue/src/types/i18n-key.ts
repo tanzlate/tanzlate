@@ -1,6 +1,9 @@
-import { I18NextContext } from 'i18next-compose';
+import { CoreContext } from '@tanzlate/step';
 import { InjectionKey, Ref } from 'vue';
 
-export type Context = Ref<I18NextContext>;
+export interface I18nContext {
+  ctx: CoreContext;
+  langRef: Ref<string>;
+}
 
-export const i18nKey = Symbol() as InjectionKey<Context>;
+export const i18nKey = Symbol() as InjectionKey<I18nContext>;

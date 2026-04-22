@@ -32,7 +32,7 @@ function i18nFormatterHelper(i18nextInstance: i18n): I18nFormatterHelper {
      * We do not enforce type of ns, since we need to also dynamically access plurals
      * e.g. we do not want to write _one or _other in the namespace
      */
-    const composeT: cTFunc = (ns: InputNamespaces, params?: TOptions): string => {
+    const tanz: cTFunc = (ns: InputNamespaces, params?: TOptions): string => {
       const namespaces: Namespace[] = [];
 
       if (Array.isArray(ns) && ns.length !== 0) {
@@ -45,8 +45,8 @@ function i18nFormatterHelper(i18nextInstance: i18n): I18nFormatterHelper {
       return t(`${level2}.${namespaces.join('.')}`, params) ?? '';
     };
 
-    composeT.namespace = level2;
-    return composeT;
+    tanz.namespace = level2;
+    return tanz;
   };
 
   return { translationHelper };

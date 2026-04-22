@@ -1,7 +1,6 @@
-import { useI18nContext } from '@/composables/context';
-import { i18nKey } from '@/types/i18n-key';
-import { Createi18nConfigParams } from 'i18next-compose';
-import { computed, defineComponent, h, PropType, provide, Suspense } from 'vue';
+import { setupI18nContext } from '@/composables/context';
+import { CoreContext, Createi18nConfigParams, useCoreContext } from '@tanzlate/step';
+import { defineComponent, h, PropType, Suspense } from 'vue';
 
 const i18nextConfigDefault: Createi18nConfigParams = {
   fallbackLng: 'en',
@@ -40,20 +39,22 @@ export default defineComponent({
     i18nextConfig: {
       type: Object as PropType<Createi18nConfigParams>,
       required: false,
-      default: () => i18nextConfigDefault,
+    },
+    i18nContext: {
+      type: Object as PropType<CoreContext>,
+      required: false,
     },
   },
   async setup(props, { slots }) {
-    const config = computed(() => {
-      return props.i18nextConfig ?? i18nextConfigDefault;
-    });
+    // provide + onUnmounted MUST happen before any await
+    const resolve = setupI18nContext();
 
-    const { initContext, context } = useI18nContext();
+    const ctx =
+      props.i18nContext ??
+      (await useCoreContext({ config: props.i18nextConfig ?? i18nextConfigDefault, ssr: false }));
 
-    provide(i18nKey, context);
-    await initContext(config.value);
+    resolve(ctx);
 
-    return () =>
-      h(Suspense, () => h('div', { class: 'i18n-provider' }, slots.default && slots.default()));
+    return () => h(Suspense, () => h('div', { class: 'i18n-provider' }, slots.default?.()));
   },
 });

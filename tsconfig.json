@@ -1,8 +1,4 @@
 {
   "files": [],
-  "references": [
-    { "path": "packages/core" },
-    { "path": "packages/i18next-compose" },
-    { "path": "packages/vue" }
-  ]
+  "references": [{ "path": "packages/core" }, { "path": "packages/vue" }]
 }

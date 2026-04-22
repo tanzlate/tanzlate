@@ -6,8 +6,8 @@ import {
   removeNumberSuffix,
   TagObject,
 } from '@/utils/parse-translation';
+import { cTFunc } from '@tanzlate/step';
 import { TOptions } from 'i18next';
-import { cTFunc } from 'i18next-compose';
 import { isString } from 'unreadable-typescript';
 import { computed, defineAsyncComponent, defineComponent, h, PropType, VNode } from 'vue';
 import { resolveRegistered } from './component-registry';

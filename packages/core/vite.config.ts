@@ -22,7 +22,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
-      name: '@use-compose/i18next-core',
+      name: '@tanzlate/step',
       fileName: (format) => {
         if (format === 'es') return 'index.mjs';
         if (format === 'cjs') return 'index.js';

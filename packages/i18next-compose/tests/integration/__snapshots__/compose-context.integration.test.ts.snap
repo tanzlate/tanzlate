@@ -1,3 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`Create a translation context and consume it > Init context and consume hook to get translation 1`] = `"Value of test key2"`;

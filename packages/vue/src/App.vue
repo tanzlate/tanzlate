@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Createi18nConfigParams } from 'i18next-compose';
+import { Createi18nConfigParams } from '@tanzlate/step';
 import i18nProvider from './components/i18nProvider.ts';
 import MainLayout from './components/layouts/MainLayout.vue';
 import HomePage from './pages/HomePage.vue';
