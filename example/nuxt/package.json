@@ -11,7 +11,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "nuxt": "3.20.1",
+    "nuxt": "3.21.0",
     "vue": "latest",
     "vue-router": "latest",
     "@use-compose/i18next-compose": "workspace:*"

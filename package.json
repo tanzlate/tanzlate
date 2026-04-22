@@ -6,9 +6,9 @@
   "private": true,
   "scripts": {
     "build": "pnpm -r build",
+    "build-packages": "pnpm build --filter './packages/**'",
     "build-step": "pnpm --filter=@tanzlate/step build",
     "build-vue": "pnpm --filter=@tanzlate/vue build",
-    "build-packages": "pnpm build --filter './packages/**'",
     "changeset": "changeset",
     "changeset:publish": "changeset publish",
     "changeset:snapshot": "changeset version --snapshot && changeset publish --tag snapshot",
@@ -38,7 +38,7 @@
   "dependencies": {
     "@eslint/js": "9.20.0",
     "eslint": "9.20.0",
-    "eslint-plugin-vue": "10.7.0",
+    "eslint-plugin-vue": "10.8.0",
     "globals": "15.15.0",
     "happy-dom": "18.0.1",
     "typescript-eslint": "8.23.0"
@@ -50,7 +50,7 @@
     "@use-compose/logger": "0.0.6",
     "eslint-config-prettier": "10.1.8",
     "husky": "9.1.7",
-    "lint-staged": "16.2.7",
+    "lint-staged": "16.3.0",
     "prettier": "3.5.3",
     "prettier-plugin-organize-imports": "4.1.0",
     "syncpack": "14.0.0-alpha.32",

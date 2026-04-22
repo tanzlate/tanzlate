@@ -14,8 +14,8 @@ importers:
         specifier: 9.20.0
         version: 9.20.0(jiti@2.6.1)
       eslint-plugin-vue:
-        specifier: 10.7.0
-        version: 10.7.0(@typescript-eslint/parser@8.23.0(eslint@9.20.0(jiti@2.6.1))(typescript@5.9.2))(eslint@9.20.0(jiti@2.6.1))(vue-eslint-parser@10.2.0(eslint@9.20.0(jiti@2.6.1)))
+        specifier: 10.8.0
+        version: 10.8.0(@typescript-eslint/parser@8.23.0(eslint@9.20.0(jiti@2.6.1))(typescript@5.9.2))(eslint@9.20.0(jiti@2.6.1))(vue-eslint-parser@10.2.0(eslint@9.20.0(jiti@2.6.1)))
       globals:
         specifier: 15.15.0
         version: 15.15.0
@@ -45,8 +45,8 @@ importers:
         specifier: 9.1.7
         version: 9.1.7
       lint-staged:
-        specifier: 16.2.7
-        version: 16.2.7
+        specifier: 16.3.0
+        version: 16.3.0
       prettier:
         specifier: 3.5.3
         version: 3.5.3
@@ -90,8 +90,8 @@ importers:
         specifier: 18.0.1
         version: 18.0.1
       i18next:
-        specifier: 25.7.1
-        version: 25.7.1(typescript@5.9.2)
+        specifier: 25.8.0
+        version: 25.8.0(typescript@5.9.2)
       i18next-fs-backend:
         specifier: 2.6.0
         version: 2.6.0
@@ -118,8 +118,8 @@ importers:
         specifier: workspace:*
         version: link:../core
       i18next:
-        specifier: 25.7.1
-        version: 25.7.1(typescript@5.9.3)
+        specifier: 25.8.0
+        version: 25.8.0(typescript@5.9.3)
       vue:
         specifier: 3.5.18
         version: 3.5.18(typescript@5.9.3)
@@ -3586,10 +3586,10 @@ packages:
       }
     engines: { node: '>=14' }
 
-  commander@14.0.2:
+  commander@14.0.3:
     resolution:
       {
-        integrity: sha512-TywoWNNRbhoD0BXs1P3ZEScW8W5iKrnbithIl0YH+uCmBd0QpPOA8yc82DS3BIE5Ma6FnBVUsJ7wVUDz4dvOWQ==,
+        integrity: sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw==,
       }
     engines: { node: '>=20' }
 
@@ -4295,16 +4295,16 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-vue@10.7.0:
+  eslint-plugin-vue@10.8.0:
     resolution:
       {
-        integrity: sha512-r2XFCK4qlo1sxEoAMIoTTX0PZAdla0JJDt1fmYiworZUX67WeEGqm+JbyAg3M+pGiJ5U6Mp5WQbontXWtIW7TA==,
+        integrity: sha512-f1J/tcbnrpgC8suPN5AtdJ5MQjuXbSU9pGRSSYAuF3SHoiYCOdEX6O22pLaRyLHXvDcOe+O5ENgc1owQ587agA==,
       }
     engines: { node: ^18.18.0 || ^20.9.0 || >=21.1.0 }
     peerDependencies:
       '@stylistic/eslint-plugin': ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0
       '@typescript-eslint/parser': ^7.0.0 || ^8.0.0
-      eslint: ^8.57.0 || ^9.0.0
+      eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       vue-eslint-parser: ^10.0.0
     peerDependenciesMeta:
       '@stylistic/eslint-plugin':
@@ -4811,10 +4811,10 @@ packages:
         integrity: sha512-3ZlhNoF9yxnM8pa8bWp5120/Ob6t4lVl1l/tbLmkml/ei3ud8IWySCHt2lrY5xWRlSU5D9IV2sm5bEbGuTqwTw==,
       }
 
-  i18next@25.7.1:
+  i18next@25.8.0:
     resolution:
       {
-        integrity: sha512-XbTnkh1yCZWSAZGnA9xcQfHcYNgZs2cNxm+c6v1Ma9UAUGCeJPplRe1ILia6xnDvXBjk0uXU+Z8FYWhA19SKFw==,
+        integrity: sha512-urrg4HMFFMQZ2bbKRK7IZ8/CTE7D8H4JRlAwqA2ZwDRFfdd0K/4cdbNNLgfn9mo+I/h9wJu61qJzH7jCFAhUZQ==,
       }
     peerDependencies:
       typescript: ^5
@@ -5256,10 +5256,10 @@ packages:
         integrity: sha512-5aHCbzQRADcdP+ATqnDuhhJ/MRIqDkZX5pyjFHRRysS8vZ5AbqGEoFIb6pYHPZ+L/OC2Lc+xT8uHVVR5CAK/wQ==,
       }
 
-  lint-staged@16.2.7:
+  lint-staged@16.3.0:
     resolution:
       {
-        integrity: sha512-lDIj4RnYmK7/kXMya+qJsmkRFkGolciXjrsZ6PC25GdTfWOAWetR0ZbsNXRAj1EHHImRSalc+whZFg56F5DVow==,
+        integrity: sha512-YVHHy/p6U4/No9Af+35JLh3umJ9dPQnGTvNCbfO/T5fC60us0jFnc+vw33cqveI+kqxIFJQakcMVTO2KM+653A==,
       }
     engines: { node: '>=20.17' }
     hasBin: true
@@ -6661,6 +6661,13 @@ packages:
       {
         integrity: sha512-5uC6DDlmeqiOwCPmK9jMSdOuZTh8bU39Ys6yidB+UTt5hfZUPGAypSgFRiEp+jbi9qH40BLDvy85jIU88wKSqw==,
       }
+
+  tinyexec@1.1.1:
+    resolution:
+      {
+        integrity: sha512-VKS/ZaQhhkKFMANmAOhhXVoIfBXblQxGX1myCQ2faQrfmobMftXeJPcZGp0gS07ocvGJWDLZGyOZDadDBqYIJg==,
+      }
+    engines: { node: '>=18' }
 
   tinyglobby@0.2.15:
     resolution:
@@ -9597,7 +9604,7 @@ snapshots:
 
   commander@10.0.1: {}
 
-  commander@14.0.2: {}
+  commander@14.0.3: {}
 
   commander@2.20.3:
     optional: true
@@ -10056,14 +10063,14 @@ snapshots:
     dependencies:
       eslint: 9.20.0(jiti@2.6.1)
 
-  eslint-plugin-vue@10.7.0(@typescript-eslint/parser@8.23.0(eslint@9.20.0(jiti@2.6.1))(typescript@5.9.2))(eslint@9.20.0(jiti@2.6.1))(vue-eslint-parser@10.2.0(eslint@9.20.0(jiti@2.6.1))):
+  eslint-plugin-vue@10.8.0(@typescript-eslint/parser@8.23.0(eslint@9.20.0(jiti@2.6.1))(typescript@5.9.2))(eslint@9.20.0(jiti@2.6.1))(vue-eslint-parser@10.2.0(eslint@9.20.0(jiti@2.6.1))):
     dependencies:
       '@eslint-community/eslint-utils': 4.9.0(eslint@9.20.0(jiti@2.6.1))
       eslint: 9.20.0(jiti@2.6.1)
       natural-compare: 1.4.0
       nth-check: 2.1.1
       postcss-selector-parser: 7.1.1
-      semver: 7.7.2
+      semver: 7.7.4
       vue-eslint-parser: 10.2.0(eslint@9.20.0(jiti@2.6.1))
       xml-name-validator: 4.0.0
     optionalDependencies:
@@ -10388,13 +10395,13 @@ snapshots:
 
   i18next-fs-backend@2.6.0: {}
 
-  i18next@25.7.1(typescript@5.9.2):
+  i18next@25.8.0(typescript@5.9.2):
     dependencies:
       '@babel/runtime': 7.28.4
     optionalDependencies:
       typescript: 5.9.2
 
-  i18next@25.7.1(typescript@5.9.3):
+  i18next@25.8.0(typescript@5.9.3):
     dependencies:
       '@babel/runtime': 7.28.4
     optionalDependencies:
@@ -10611,15 +10618,15 @@ snapshots:
     dependencies:
       uc.micro: 2.1.0
 
-  lint-staged@16.2.7:
+  lint-staged@16.3.0:
     dependencies:
-      commander: 14.0.2
+      commander: 14.0.3
       listr2: 9.0.5
       micromatch: 4.0.8
       nano-spawn: 2.0.0
-      pidtree: 0.6.0
       string-argv: 0.3.2
-      yaml: 2.8.1
+      tinyexec: 1.1.1
+      yaml: 2.8.2
 
   listr2@9.0.5:
     dependencies:
@@ -11383,6 +11390,8 @@ snapshots:
 
   tinyexec@1.0.1: {}
 
+  tinyexec@1.1.1: {}
+
   tinyglobby@0.2.15:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.3)
@@ -11894,8 +11903,7 @@ snapshots:
 
   yaml@2.8.1: {}
 
-  yaml@2.8.2:
-    optional: true
+  yaml@2.8.2: {}
 
   yargs-parser@21.1.1: {}
 
