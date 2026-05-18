@@ -6,41 +6,25 @@ import {
   removeNumberSuffix,
   TagObject,
 } from '@/utils/parse-translation';
-import { cTFunc } from '@tanzlate/step';
+import { TFunc } from '@tanzlate/core';
 import { TOptions } from 'i18next';
 import { isString } from 'unreadable-typescript';
-import { computed, defineAsyncComponent, defineComponent, h, PropType, VNode } from 'vue';
+import {
+  computed,
+  defineAsyncComponent,
+  defineComponent,
+  h,
+  HTMLAttributes,
+  PropType,
+  VNode,
+  VNodeProps,
+} from 'vue';
 import { resolveRegistered } from './component-registry';
 
-type ComponentPropValue =
-  | string
-  | number
-  | boolean
-  | null
-  | undefined
-  | object
-  | Date
-  | Array<string | number | boolean | null | undefined | object | Date | symbol>
-  | symbol;
-
-type ComponentsProps = {
-  [name: string]: { [key: string]: ComponentPropValue } | null;
-};
-
-// type ComponentsProps = VNodeProps &
-//   HTMLAttributes & {
-//     [name: string]: (VNodeProps & HTMLAttributes & { [key: string]: unknown }) | null;
-//   };
-
-// TODO-NUXT-3: https://www.notion.so/reteach/Interpolation-of-href-HTML-tags-186dffa13e1d4536838ed65b30849cbb?pvs=4
-// and PR https://github.com/reteach/reteach-app/pull/3159 + https://github.com/reteach/reteach-app/pull/3853
-// type ComponentsProps = Record<string, HTMLAttributes>;
-
-/*
- * TODO-NUXT-3: Breaking changes in Render Function API and Functional Components
- * https://v3-migration.vuejs.org/breaking-changes/render-function-api.html
- * https://v3-migration.vuejs.org/breaking-changes/functional-components.html
- */
+type ComponentsProps = VNodeProps &
+  HTMLAttributes & {
+    [name: string]: (VNodeProps & HTMLAttributes & { [key: string]: unknown }) | null;
+  };
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
@@ -50,8 +34,8 @@ export default defineComponent({
      * (required)
      * Current context translation function
      */
-    cTranslate: {
-      type: Function as PropType<cTFunc>,
+    tZ: {
+      type: Function as PropType<TFunc>,
       required: true,
     },
     /**
@@ -76,7 +60,7 @@ export default defineComponent({
      *
      * Example:
      * <Translate
-     *   :cTranslate="t"
+     *   :tZ="t"
      *   i18nKey="welcomeMessage"
      *   :values="{ name: 'John' }"
      *   :components="{
@@ -107,16 +91,16 @@ export default defineComponent({
   setup(props) {
     // 1. Get current translation
     const translationValue = computed(() => {
-      const { translationValue, cTranslate, i18nKey, values } = props;
+      const { translationValue, tZ, i18nKey, values } = props;
       if (translationValue) {
         return translationValue;
       }
 
       if (values) {
-        return cTranslate(i18nKey, values);
+        return tZ(i18nKey, values);
       }
 
-      return cTranslate(i18nKey);
+      return tZ(i18nKey);
     });
 
     /**

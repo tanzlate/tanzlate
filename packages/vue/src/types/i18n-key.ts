@@ -1,9 +1,9 @@
-import { CoreContext } from '@tanzlate/step';
+import { CoreContext } from '@tanzlate/vanilla';
 import { InjectionKey, Ref } from 'vue';
 
 export interface I18nContext {
   ctx: CoreContext;
-  langRef: Ref<string>;
+  lang: Ref<string>;
 }
 
 export const i18nKey = Symbol() as InjectionKey<I18nContext>;

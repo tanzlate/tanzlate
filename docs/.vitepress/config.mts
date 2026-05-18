@@ -3,8 +3,6 @@ import { withMermaid } from 'vitepress-plugin-mermaid';
 import typedocSidebar from '../typedoc-api/typedoc-sidebar.json';
 
 const sidebar = {
-  // This sidebar gets displayed when a user
-  // is on `guide` directory.
   '/': [
     {
       text: 'Overview',
@@ -15,26 +13,30 @@ const sidebar = {
     },
     {
       text: 'Guide',
+      items: [{ text: 'Getting Started', link: '/guide/getting-started' }],
+    },
+    {
+      text: 'Vanilla JS',
       items: [
-        { text: 'Getting Started', link: '/guide/getting-started' },
-        { text: 'Features', link: '/guide/features' },
+        { text: 'Overview', link: '/vanilla/' },
+        { text: 'Utility Functions', link: '/api/utility-functions' },
+        { text: 'Types', link: '/api/types' },
+      ],
+    },
+    {
+      text: 'Best Practices',
+      items: [
+        { text: 'Overview', link: '/best-practices/' },
+        { text: 'Naming Conventions', link: '/best-practices/naming-convention-for-the-keys' },
       ],
     },
     {
       text: 'Vue',
       items: [
         { text: 'Getting Started', link: '/vue/' },
-        { text: 'Components Interpolation', link: '/vue/components-interpolation' },
+        { text: 'Component Interpolation', link: '/vue/components-interpolation' },
         { text: 'Component Registry', link: '/vue/component-registry' },
-        { text: 'Research', link: '/vue/research' },
         { text: 'API', link: '/vue/api' },
-      ],
-    },
-    {
-      text: 'API',
-      items: [
-        { text: 'Utility Functions', link: '/api/utility-functions' },
-        { text: 'Types', link: '/api/types' },
       ],
     },
     {
@@ -44,20 +46,18 @@ const sidebar = {
   ],
 };
 
-// https://vitepress.dev/reference/site-config
 const config = defineConfig({
-  title: 'i18next-compose',
-  description: 'A VitePress Site',
+  title: 'tanzlate',
+  description: 'i18n for Vue 3 and Nuxt — with full component interpolation.',
   themeConfig: {
-    // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' },
+      { text: 'Guide', link: '/guide/getting-started' },
     ],
 
     sidebar: sidebar,
 
-    socialLinks: [{ icon: 'github', link: 'https://github.com/use-compose/i18next-compose' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/use-compose/tanzlate' }],
   },
   cleanUrls: true,
 });

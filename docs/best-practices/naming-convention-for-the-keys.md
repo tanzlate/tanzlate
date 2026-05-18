@@ -1,3 +1,9 @@
+---
+title: Naming Conventions
+titleTemplate: tanzlate
+outline: [2, 3]
+---
+
 # What are translation keys?
 
 Translation keys are unique identifiers to reference specific text strings that require translation.
@@ -44,8 +50,6 @@ The `description_of_the_content` will be the direct description of the key conte
 
 Note: in some specific cases, we can consider using 4 levels of categories, such in a case of a nested form.
 
-**→ example October 16, 2023 @Arthur**
-
 ## The `global` Namespace
 
 The `global` namespace is where are stored translations that are likely to be used multiple times in the app. Some example can be:
@@ -75,7 +79,7 @@ Don’t hesitate to use a long description e.g. `data_processing_agreement_not_s
 
 # Avoid concatenating translations
 
-It seems some[times intuitive and eas](http://lingenu.org)ier to concatenate existing keys to create a new string.
+It seems sometimes intuitive and easier to concatenate existing keys to create a new string.
 
 For example, in a case where you have two different keys “agree” and “proceed” already existing.
 

@@ -1,5 +1,5 @@
 ---
-'@tanzlate/step': minor
+'@tanzlate/core': minor
 '@tanzlate/vue': minor
 ---
 

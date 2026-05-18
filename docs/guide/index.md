@@ -1,25 +1,47 @@
 ---
-title: Vanilla JS Overview
-titleTemplate: i18next-compose
-description: Overview of i18next-compose vanilla JS package — parsing and interpolation without framework bindings.
+title: Getting Started
+titleTemplate: tanzlate
+description: Overview of the tanzlate core package — parsing and interpolation without framework bindings.
 outline: [2, 3]
 sidebarDepth: 2
 ---
 
-# i18next-compose (Vanilla JS)
+# Getting Started
 
-The **vanilla JS package** is framework-agnostic. It parses translation strings into an AST and resolves `{{ values }}`.
+tanzlate is a framework-agnostic i18n library built on top of i18next. It adds component interpolation, namespace helpers, and framework-specific renderers for Vue and React.
 
 ## Installation
 
-```bash
-npm install i18next-compose
+::: code-group
+
+```bash [npm]
+npm install @tanzlate/core
 ```
 
-```bash
-yarn add i18next-compose
+```bash [yarn]
+yarn add @tanzlate/core
 ```
 
-```bash
-pnpm add i18next-compose
+```bash [pnpm]
+pnpm add @tanzlate/core
 ```
+
+:::
+
+For Vue:
+
+::: code-group
+
+```bash [npm]
+npm install @tanzlate/vue
+```
+
+```bash [yarn]
+yarn add @tanzlate/vue
+```
+
+```bash [pnpm]
+pnpm add @tanzlate/vue
+```
+
+:::

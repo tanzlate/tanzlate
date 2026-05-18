@@ -1,5 +1,5 @@
 ---
-'@tanzlate/step': patch
+'@tanzlate/core': patch
 '@tanzlate/vue': patch
 ---
 

@@ -1,8 +1,9 @@
-# @use-compose/i18next-compose-root
+# @tanzlate/root
 
 ## Modules
 
-| Module                                              | Description |
-| --------------------------------------------------- | ----------- |
-| [core/src](core/src/index.md)                       | -           |
-| [i18next-compose/src](i18next-compose/src/index.md) | -           |
+| Module                              | Description |
+| ----------------------------------- | ----------- |
+| [core/src](core/src/index.md)       | -           |
+| [vanilla/src](vanilla/src/index.md) | -           |
+| [vue/src](vue/src/index.md)         | -           |

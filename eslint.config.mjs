@@ -16,12 +16,12 @@ export default [
     languageOptions: { parserOptions: { parser: tseslint.parser } },
     rules: {
       'no-console': 'error',
-      // 'vue/multi-word-component-names': [
-      //   'off',
-      //   {
-      //     ignores: ['index'],
-      //   },
-      // ],
+      'vue/multi-word-component-names': [
+        'off',
+        {
+          ignores: ['index'],
+        },
+      ],
       'vue/component-name-in-template-casing': ['warn', 'PascalCase'],
       '@typescript-eslint/no-empty-object-type': 'off',
     },

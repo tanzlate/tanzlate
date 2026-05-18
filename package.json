@@ -7,7 +7,8 @@
   "scripts": {
     "build": "pnpm -r build",
     "build-packages": "pnpm build --filter './packages/**'",
-    "build-step": "pnpm --filter=@tanzlate/step build",
+    "build-core": "pnpm --filter=@tanzlate/core build",
+    "build-vanilla": "pnpm --filter=@tanzlate/vanilla build",
     "build-vue": "pnpm --filter=@tanzlate/vue build",
     "changeset": "changeset",
     "changeset:publish": "changeset publish",
@@ -21,10 +22,11 @@
     "docs:build": "pnpm --filter docs docs:build",
     "docs:dev": "pnpm --filter docs docs:dev",
     "docs:preview": "pnpm --filter docs docs:preview",
+    "app:nuxt": "PORT=3003 pnpm --filter=@tanzlate/nuxt-example dev",
     "format": "prettier --write .",
     "lint": "eslint .",
     "prepare": "husky",
-    "preview": "pnpm --filter @tanzlate/step preview",
+    "preview": "pnpm --filter @tanzlate/vanilla preview",
     "preview:vue": "pnpm --filter=@tanzlate/vue preview",
     "release": "pnpm build && pnpm changeset:publish",
     "release:snapshot": "pnpm build && pnpm changeset:snapshot",
@@ -65,7 +67,7 @@
     "pnpm": ">=9"
   },
   "keywords": [],
-  "license": "ISC",
+  "license": "MIT",
   "lint-staged": {
     "**/*.{js,ts,tsx}": [
       "eslint --fix"

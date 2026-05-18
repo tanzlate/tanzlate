@@ -1,8 +1,10 @@
 {
   "entryPoints": [
-    "./packages/core/src/index.ts"
-    // "./packages/vue/src/index.ts"
+    "./packages/core/src/index.ts",
+    "./packages/vanilla/src/index.ts",
+    "./packages/vue/src/index.ts"
   ],
+  "tsconfig": "./tsconfig.json",
   "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
   "out": "./docs/typedoc-api",
   "docsRoot": "./docs",
@@ -10,11 +12,12 @@
   "readme": "./docs/README.md",
   "indexFormat": "table",
   "useCodeBlocks": true,
-  "disableSources": true,
+  "disableSources": false,
+  "excludeInternal": true,
   "sidebar": {
     "autoConfiguration": true,
     "format": "vitepress",
-    "pretty": false,
+    "pretty": true,
     "collapsed": false
   },
   "jsDocCompatibility": {

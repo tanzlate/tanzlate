@@ -1,50 +1,45 @@
-import { i18nKey } from '@/types/i18n-key';
-import { CoreContext, cTFunc } from '@tanzlate/step';
-import { computed, inject, onUnmounted, provide, ref, shallowReactive } from 'vue';
+import { I18nContext, i18nKey } from '@/types/i18n-key';
+import { InputNamespaces, TFunc } from '@tanzlate/core';
+import { contextCoreStub, CoreContext } from '@tanzlate/vanilla';
+import { TOptions } from 'i18next';
+import { inject, onUnmounted, provide, ref } from 'vue';
 
-/**
- * Sync setup: registers provide + onUnmounted before any await.
- * Returns a resolve function to call once the CoreContext is ready.
- */
 export function setupI18nContext() {
-  const langRef = ref('en');
-  const state = shallowReactive({ ctx: null as unknown as CoreContext, langRef });
-  provide(i18nKey, state);
+  const lang = ref('en');
+  const context: I18nContext = {
+    ctx: contextCoreStub(),
+    lang,
+  };
+  provide(i18nKey, context);
 
-  let cleanup: (() => void) | undefined;
-  onUnmounted(() => cleanup?.());
+  let unsubscribe: (() => void) | undefined;
+  onUnmounted(() => unsubscribe?.());
 
   return function resolve(ctx: CoreContext) {
-    state.ctx = ctx;
-    state.langRef.value = ctx.i18nApp.language;
-    cleanup = ctx.onLangChange((lng) => {
-      state.langRef.value = lng;
+    context.ctx = ctx;
+    lang.value = ctx.i18nApp.language;
+    unsubscribe = ctx.onLangChange((lng: string) => {
+      lang.value = lng;
     });
   };
 }
 
-/** Convenience wrapper for sync callers that already have a CoreContext. */
-export function provideI18nContext(ctx: CoreContext) {
-  setupI18nContext()(ctx);
-}
-
 export function useI18n(ns: string) {
-  const injected = inject(i18nKey)!;
-
-  function forNamespace(namespace: string): cTFunc {
-    const helper = computed(() => {
-      void injected.langRef.value; // re-evaluates when language changes
-      return injected.ctx.composeHelper(namespace);
-    });
-    return (key, opts) => helper.value(key, opts);
-  }
+  const { ctx, lang } = inject(i18nKey)!;
+  const helper = ctx.composeHelper(ns);
+  const globalHelper = ctx.composeHelper('global');
 
   return {
-    cT: forNamespace(ns),
-    globalT: forNamespace('global'),
-    forNamespace,
-    lang: injected.langRef,
-    changeLanguage: injected.ctx.lang,
-    i18nApp: injected.ctx.i18nApp,
+    tanz: ((key: InputNamespaces, opts?: TOptions) => {
+      void lang.value;
+      return helper(key, opts);
+    }) as TFunc,
+    globalT: ((key: InputNamespaces, opts?: TOptions) => {
+      void lang.value;
+      return globalHelper(key, opts);
+    }) as TFunc,
+    lang,
+    changeLanguage: ctx.lang,
+    i18nApp: ctx.i18nApp,
   };
 }

@@ -38,7 +38,7 @@ export default defineConfig({
     // generate .vite/manifest.json in outDir
     // manifest: true,
     rollupOptions: {
-      external: ['@tanzlate/step', 'vue'],
+      external: ['@tanzlate/core', '@tanzlate/vanilla', 'vue'],
       output: { globals: { vue: 'Vue' } },
     },
     target: 'esnext',

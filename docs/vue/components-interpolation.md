@@ -1,123 +1,125 @@
 ---
-title: Translation Interpolation
-titleTemplate: i18next-compose-vue
-description: Using the RtTranslate component to render complex translations with components and values.
+title: Component Interpolation
+titleTemplate: tanzlate
+description: Using the Tanzlate component to render Vue components and HTML tags inside translation strings.
 outline: [2, 3]
 ---
 
-# Components Interpolation
+# Component Interpolation
 
-Support for rendering Vue components and HTML tags with custom props and attributes inside translation strings focusing on human-readable approach.
+Render Vue components and HTML tags with props inside translation strings — keeping the full sentence in one place for translators and content writers.
 
-## 3. Using a single component to interpolate and handle complex translation values containing Vue components
+## From template to translation string
 
-This component would accept the following props:
-
-- The current translations functions (`rtTranslate` or `rtGlobalT`for example) in a given context (reactive)
-- The translation key
-- The potential params/values inside the translations (reactive)
-- The list of components to interpolate, as an object where we will pass the props - as they could be dynamic, they won't be part of the translation string
+The starting point is usually a hardcoded template with components inline:
 
 ```vue
-<RtTranslate
-  :rt-translate="rtTranslate"
-  i18n-key="interpolate_with_complex_translation"
-  :components="{
-    NuxtLink: { to: toCourseList },
-    SelfClosingComponent: { prop1: 'prop1', prop2: 'prop2' },
-    NuxtLink-2: { to: 'blablabla' },
-  }"
-/>
-```
-
-By specifying `NuxtLink` through different names (`NuxtLink1` and `NuxtLink-2`) we ensure to not overlap any existing properties.
-
-## 2. Using a parsing function to correctly render the translation value based on the eixstence of Vue components
-
-Starting from this translation
-`Hallo und <NuxtLink>Wilkommen zurück</NuxtLink>! Viel Spaß <NuxtLink-2>mit unserer <SelfClosingComponent />App</NuxtLink-2><library-component> sie uns </library-component/> wissen`
-
-The idea is to get something as such:
-
-```javascript
-[
-  'Hallo und ',
-  {
-    tag: 'NuxtLink',
-    content: 'Wilkommen zurück',
-  },
-  '! Viel Spaß ',
-  {
-    tag: 'NuxtLink-2',
-    // this would need to be recursively parsed
-    content: 'mit unserer <SelfClosingComponent />App',
-  },
-];
-```
-
-To make it easier to work with afterwards
-
-Example:
-
-1. Initial code:
-
-```html
 <template>
-  <!-- using a render function, this extra div could potentially be avoided -->
   <div>
-    Hallo und <NuxtLink :to="link1">Wilkommen zurück</NuxtLink>! Viel Spaß
-    <NuxtLink-2 :to="link2">mit unserer <SelfClosingComponent :prop="nameOfProp" /> App</NuxtLink-2>
-    <library-component> sie uns </library-component> wissen
+    Hi {{ name }}! Your <UserBadge :level="user.level" /> is ready.
+    <AppButton variant="primary" @click="startTour">Start tour</AppButton>
   </div>
 </template>
 ```
 
-2. Translation string:
-   `"Hallo und <NuxtLink>Wilkommen zurück</NuxtLink>! Viel Spaß <NuxtLink-2>mit unserer <SelfClosingComponent />App</NuxtLink-2><library-component> sie uns </library-component/> wissen"`
+With tanzlate you extract the sentence into a translation string and map the component tags:
 
-3. Using the `RtTranslate` component:
+```json
+{
+  "onboarding": {
+    "welcome": "Hi {{ name }}! Your <UserBadge /> is ready. <AppButton>Start tour</AppButton>"
+  }
+}
+```
 
 ```vue
-<RtTranslate
-  :rt-translate="rtTranslate"
-  i18n-key="name_of_key"
+<Tanzlate
+  :t-z="tanz"
+  i18n-key="welcome"
+  :values="{ name: user.name }"
   :components="{
-    NuxtLink: { to: someLocation },
-    'NuxtLink-2': { to: anoTherLocation, prop2: value },
-    'library-component': {},
+    UserBadge: { level: user.level },
+    AppButton: { variant: 'primary', onClick: startTour },
   }"
-  :values="{ valueToInterpolate1: 'test' }"
 />
 ```
 
-### Explanation
+Props removed from the template move into the `:components` object. The translation string keeps the full readable sentence.
 
-Parse a given translation string and return an array of strings and objects e.g. for a key
+## HTML tags
+
+Lowercase tags (`<b>`, `<a>`, `<strong>`) are rendered as real HTML elements — no `v-html` needed:
 
 ```json
-"Wunderbar! <NuxtLink>The customer <strong>{{ customer.name }}</strong></NuxtLink> hat den <NuxtLink-2>Kurs</NuxtLink-2> erfolgreich absolviert."
+{ "help": "Read the <a>documentation</a> or ask on <strong>Discord</strong>." }
 ```
 
-Will return
+```vue
+<Tanzlate
+  :t-z="tanz"
+  i18n-key="help"
+  :components="{
+    a: { href: 'https://tanzlate.dev', target: '_blank' },
+  }"
+/>
+```
+
+## Using the same component twice
+
+Suffix duplicate tags with `-N` to differentiate them:
+
+```json
+{ "links": "Go to <NuxtLink>home</NuxtLink> or <NuxtLink-2>profile</NuxtLink-2>." }
+```
+
+```vue
+<Tanzlate
+  :t-z="tanz"
+  i18n-key="links"
+  :components="{
+    NuxtLink: { to: '/' },
+    'NuxtLink-2': { to: '/profile' },
+  }"
+/>
+```
+
+The suffix is stripped before resolving the component — both resolve to `NuxtLink`.
+
+## Nested components
+
+Components can nest — the parser handles it recursively:
+
+```json
+{
+  "course": "Wunderbar! <NuxtLink>The customer <strong>{{ name }}</strong></NuxtLink> finished the <NuxtLink-2>course</NuxtLink-2>."
+}
+```
+
+The parser produces this structure before rendering:
 
 ```ts
 [
   'Wunderbar! ',
   {
     tag: 'NuxtLink',
-    content: [
-      'The customer ',
-      {
-        tag: 'strong',
-        content: 'Arthur',
-      },
-    ],
+    content: ['The customer ', { tag: 'strong', content: 'Arthur' }],
   },
-  ' hat den ',
-  {
-    tag: 'NuxtLink-2',
-    content: 'Kurs',
-  },
-  ' erfolgreich absolviert.',
+  ' finished the ',
+  { tag: 'NuxtLink-2', content: 'course' },
+  '.',
 ];
 ```
+
+## Component registry
+
+For components used across many translation strings, register them once globally instead of passing `:components` on every usage:
+
+```ts
+// main.ts
+import { registerComponent } from '@tanzlate/vue';
+import UserBadge from '@/components/UserBadge.vue';
+
+registerComponent('UserBadge', UserBadge);
+```
+
+The `:components` prop takes priority over the registry when both supply the same tag.

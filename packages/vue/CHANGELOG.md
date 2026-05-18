@@ -11,7 +11,7 @@
 - 9a1e52f: Implement interpolation of Vue Component self-closing tags first working version \n Fix lint and cleanup / document Translate component
 - Updated dependencies [9a1e52f]
 - Updated dependencies [04d4919]
-  - @tanzlate/step@0.2.0
+  - @tanzlate/core@0.2.0
 
 ## 0.0.2
 

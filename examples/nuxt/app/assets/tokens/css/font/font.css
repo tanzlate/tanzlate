@@ -1,0 +1,36 @@
+/**
+ * Do not edit directly, this file was auto-generated.
+ */
+
+:root {
+  --font-min-font: 14;
+  --font-max-font: 24;
+  --font-min-viewport: 360;
+  --font-max-viewport: 1280;
+  --font-scale-min: 1.125;
+  --font-scale-max: 1.2;
+  --font-steps: h1, h2, h3, h4, h5, h6, md, sm, xs;
+  --font-weight-thin: 100;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --font-weight-black: 900;
+  --font-line-height-1: 1;
+  --font-line-height-2: 1.1;
+  --font-line-height-3: 1.25;
+  --font-line-height-4: 1.3;
+  --font-line-height-5: 1.35;
+  --font-line-height-6: 1.4;
+  --font-line-height-7: 1.45;
+  --font-line-height-8: 1.5;
+  --font-scale-0: clamp(0.875rem, 0.63rem + 1.087vw, 1.5rem);
+  --font-scale-1: clamp(0.984rem, 0.665rem + 1.418vw, 1.8rem);
+  --font-scale-2: clamp(1.107rem, 0.696rem + 1.831vw, 2.16rem);
+  --font-scale-3: clamp(1.246rem, 0.719rem + 2.341vw, 2.592rem);
+  --font-scale-4: clamp(1.402rem, 0.733rem + 2.972vw, 3.11rem);
+  --font-scale-5: clamp(1.577rem, 0.733rem + 3.749vw, 3.732rem);
+  --font-scale-6: clamp(1.774rem, 0.715rem + 4.705vw, 4.479rem);
+  --font-scale-7: clamp(1.996rem, 0.673rem + 5.877vw, 5.375rem);
+  --font-scale-8: clamp(2.245rem, 0.6rem + 7.312vw, 6.45rem);
+}
