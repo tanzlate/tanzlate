@@ -2,7 +2,7 @@
   "files": [],
   "references": [
     { "path": "packages/core" },
-    { "path": "packages/i18next-compose" },
+    { "path": "packages/vanilla" },
     { "path": "packages/vue" }
   ]
 }

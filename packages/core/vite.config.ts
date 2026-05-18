@@ -12,17 +12,10 @@ export default defineConfig({
       rollupTypes: true,
     }),
   ],
-  resolve: {
-    alias: [{ find: '@', replacement: fileURLToPath(new URL('./src/', import.meta.url)) }],
-
-    // Avoid browser polyfills for node built-ins
-    // Ensure resolve favors node conditions (prevents browser extern shims)
-    conditions: ['node', 'module', 'import', 'default'],
-  },
   build: {
     lib: {
-      entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
-      name: '@use-compose/i18next-core',
+      entry: fileURLToPath(new URL('./src/', import.meta.url)),
+      name: '@tanzlate/core',
       fileName: (format) => {
         if (format === 'es') return 'index.mjs';
         if (format === 'cjs') return 'index.js';
@@ -33,9 +26,8 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     rollupOptions: {
-      external: ['i18next', 'i18next-fs-backend'],
+      external: ['i18next'],
     },
-    // Optional: let modern features pass through if any remain
     target: 'esnext',
   },
 });

@@ -1,0 +1,21 @@
+{
+  "name": "@tanzlate/nuxt-example",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@use-compose/ui": "0.7.0",
+    "@tanzlate/core": "workspace:*",
+    "@tanzlate/vanilla": "workspace:*",
+    "@tanzlate/vue": "workspace:^",
+    "nuxt": "^4.4.2",
+    "vue": "^3.5.32",
+    "vue-router": "^5.0.4"
+  }
+}

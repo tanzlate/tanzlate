@@ -11,7 +11,7 @@ Research and exploration of translation strategies for the i18next-compose proje
 
 # Inspiration from existing libraries
 
-### 1. Component interpolation from [vue-i18next](https://panter.github.io/vue-i18next/guide/component-interpolation.html) and [i18next-vue](https://i18next.github.io/i18next-vue/guide/component-interpolation.html#component-interpolation)
+### 1. Component interpolation from [vue-i18next](https://panter.github.io/vue-i18next/guide/component-interpolation.html) and [i18next-vue](https://i18next.github.io/i18next-vue/guide/component-interpolation.html#component-interpolation)([GitHub])(https://github.com/i18next/i18next-http-backend/blob/master/example/vue/src/vue-i18next.js))
 
 Especially the first one looked promising looking at this issue https://github.com/i18next/i18next-vue/issues/8 as it seemed more dynamic.
 

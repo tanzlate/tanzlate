@@ -14,6 +14,23 @@ export default [
   {
     files: ['**/*.vue'],
     languageOptions: { parserOptions: { parser: tseslint.parser } },
+    rules: {
+      'no-console': 'error',
+      'vue/multi-word-component-names': [
+        'off',
+        {
+          ignores: ['index'],
+        },
+      ],
+      'vue/component-name-in-template-casing': ['warn', 'PascalCase'],
+      '@typescript-eslint/no-empty-object-type': 'off',
+    },
+    settings: {
+      'editor.formatOnSave': true,
+      failOnError: true,
+      failOnWarn: false,
+      '@stylistic/semi': true,
+    },
   },
   {
     ignores: [

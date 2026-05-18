@@ -24,7 +24,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
-      name: 'i18next-compose-vue',
+      name: '@tanzlate/vue',
       fileName: (format) => {
         if (format === 'es') return 'index.mjs';
         if (format === 'cjs') return 'index.js';
@@ -38,7 +38,7 @@ export default defineConfig({
     // generate .vite/manifest.json in outDir
     // manifest: true,
     rollupOptions: {
-      external: ['@use-compose/i18next-core', 'i18next-compose', 'vue'],
+      external: ['@tanzlate/core', '@tanzlate/vanilla', 'vue'],
       output: { globals: { vue: 'Vue' } },
     },
     target: 'esnext',

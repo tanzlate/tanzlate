@@ -1,0 +1,11 @@
+{
+  "app_namespace": {
+    "home": {
+      "welcome": "Welcome to tanzlate with <LangSwitcher>switch language</LangSwitcher>",
+      "description": "A simple <b>example</b> of tanzlate in a Nuxt app",
+      "interpolationExample": "Interpolation with a <a target=\"_blank\" href=\"{{- test}}\">link</a> and a <strong>strong</strong> tag.",
+      "componentInterpolationExample": "An example of <ColoredLabel /> component <b>interpolation</b> with a <ColoredLabel-1>colored label</ColoredLabel-1>. And a <a>link</a>.",
+      "lesson_sidebar_text": "The course <span class=\"text-primary\">\"{{name}}\"</span> is set to <span class=\"text-primary\">\"{{ courseVisibility }}\"</span>. The visibility setting here only affects this lesson and does not impact the course."
+    }
+  }
+}

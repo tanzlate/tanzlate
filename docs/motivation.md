@@ -3,23 +3,23 @@ outline: [2, 3]
 order: 1
 ---
 
-# i18next-compose
+# tanzlate
 
-![NPM Package Version](https://img.shields.io/npm/v/i18next-compose?color=519ea9)
+![NPM Package Version](https://img.shields.io/npm/v/@tanzlate/core?color=519ea9)
 
-A lightweight library to manage translations with **component interpolation** and **complex translation strings**
+A lightweight library to manage translations with **component interpolation** and **complex translation strings**.
 
 ## Motivation
 
-Translation is rarely just an engineering concern—it often involves multiple teams:
+Translation is rarely just an engineering concern — it often involves multiple teams:
 
 - **Developers** implement the system.
 - **Translators** provide the content.
 - **Designers** ensure proper rendering.
-- **Product** Owners/Managers validate results.
-- **Content** Writers refine copy.
+- **Product Owners/Managers** validate results.
+- **Content Writers** refine copy.
 
-i18next-compose provides a modular and efficient way to keep everyone aligned, without enforcing global `$t` helpers.
+tanzlate provides a modular and efficient way to keep everyone aligned, without enforcing global `$t` helpers.
 
 ---
 
@@ -39,15 +39,15 @@ This library keeps everyone aligned by making complex translations easier to man
 ::: code-group
 
 ```bash [npm]
-npm install i18next-compose
+npm install @tanzlate/core
 ```
 
 ```bash [yarn]
-yarn add i18next-compose
+yarn add @tanzlate/core
 ```
 
 ```bash [pnpm]
-pnpm add i18next-compose
+pnpm add @tanzlate/core
 ```
 
 :::
