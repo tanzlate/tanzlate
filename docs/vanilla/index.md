@@ -1,25 +1,29 @@
 ---
 title: Vanilla JS Overview
-titleTemplate: i18next-compose
-description: Overview of i18next-compose vanilla JS package — parsing and interpolation without framework bindings.
+titleTemplate: tanzlate
+description: Overview of the tanzlate core package — parsing and interpolation without framework bindings.
 outline: [2, 3]
 sidebarDepth: 2
 ---
 
-# i18next-compose (Vanilla JS)
+# tanzlate (Vanilla JS)
 
-The **vanilla JS package** is framework-agnostic. It parses translation strings into an AST and resolves `{{ values }}`.
+The **core package** is framework-agnostic. It parses translation strings into an AST and resolves `{{ values }}`.
 
 ## Installation
 
-```bash
-npm install i18next-compose
+::: code-group
+
+```bash [npm]
+npm install @tanzlate/core
 ```
 
-```bash
-yarn add i18next-compose
+```bash [yarn]
+yarn add @tanzlate/core
 ```
 
-```bash
-pnpm add i18next-compose
+```bash [pnpm]
+pnpm add @tanzlate/core
 ```
+
+:::

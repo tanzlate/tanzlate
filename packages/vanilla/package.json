@@ -1,0 +1,47 @@
+{
+  "name": "@tanzlate/vanilla",
+  "version": "0.2.0",
+  "private": false,
+  "scripts": {
+    "build": "tsc && vite build",
+    "dev": "vite",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@tanzlate/core": "workspace:*",
+    "i18next": "25.8.0",
+    "i18next-fs-backend": "2.6.0"
+  },
+  "devDependencies": {
+    "@use-compose/logger": "0.0.6",
+    "happy-dom": "18.0.1",
+    "typescript": "5.9.2",
+    "vite": "7.2.6",
+    "vite-plugin-dts": "4.5.4",
+    "vitest": "3.2.4"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.cohttps://nuxt.com/docs/4.x/api/kit/compatibility#usage-1m/arthur-plazanet/i18next-compose.git"
+  },
+  "type": "module",
+  "types": "dist/index.d.ts"
+}

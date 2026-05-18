@@ -1,110 +1,72 @@
 ---
 title: Translation Interpolation
-titleTemplate: i18next-compose-vue
-description: Using the RtTranslate component to render complex translations with components and values.
+titleTemplate: tanzlate
+description: Using the Trans component to render complex translations with components and values.
 outline: [2, 3]
 ---
 
 # Components Interpolation
 
-Support for rendering Vue components and HTML tags with custom props and attributes inside translation strings focusing on human-readable approach.
+Support for rendering React components and HTML tags with custom props inside translation strings, with a focus on human-readable strings.
 
-## 3. Using a single component to interpolate and handle complex translation values containing Vue components
+## Using a single component to interpolate complex translations
 
-This component would accept the following props:
+The `<Trans>` component accepts:
 
-- The current translations functions (`rtTranslate` or `rtGlobalT`for example) in a given context (reactive)
+- The current translation function (`cT` from `useI18n`) in a given context
 - The translation key
-- The potential params/values inside the translations (reactive)
-- The list of components to interpolate, as an object where we will pass the props - as they could be dynamic, they won't be part of the translation string
+- Optional interpolation values
+- The list of components to interpolate, as an object where props are passed inline
 
-```vue
-<RtTranslate
-  :rt-translate="rtTranslate"
-  i18n-key="interpolate_with_complex_translation"
-  :components="{
-    NuxtLink: { to: toCourseList },
+```tsx
+<Trans
+  t={cT}
+  i18nKey="interpolate_with_complex_translation"
+  components={{
+    Link: { to: toCourseList },
     SelfClosingComponent: { prop1: 'prop1', prop2: 'prop2' },
-    NuxtLink-2: { to: 'blablabla' },
-  }"
+    'Link-2': { to: 'blablabla' },
+  }}
 />
 ```
 
-By specifying `NuxtLink` through different names (`NuxtLink1` and `NuxtLink-2`) we ensure to not overlap any existing properties.
+## Parsing translation strings
 
-## 2. Using a parsing function to correctly render the translation value based on the eixstence of Vue components
+Starting from this translation:
+`Hallo und <Link>Wilkommen zurück</Link>! Viel Spaß <Link-2>mit unserer <SelfClosingComponent />App</Link-2>`
 
-Starting from this translation
-`Hallo und <NuxtLink>Wilkommen zurück</NuxtLink>! Viel Spaß <NuxtLink-2>mit unserer <SelfClosingComponent />App</NuxtLink-2><library-component> sie uns </library-component/> wissen`
+The parser produces:
 
-The idea is to get something as such:
-
-```javascript
+```ts
 [
   'Hallo und ',
   {
-    tag: 'NuxtLink',
+    tag: 'Link',
     content: 'Wilkommen zurück',
   },
   '! Viel Spaß ',
   {
-    tag: 'NuxtLink-2',
-    // this would need to be recursively parsed
+    tag: 'Link-2',
     content: 'mit unserer <SelfClosingComponent />App',
   },
 ];
 ```
 
-To make it easier to work with afterwards
+### AST output
 
-Example:
-
-1. Initial code:
-
-```html
-<template>
-  <!-- using a render function, this extra div could potentially be avoided -->
-  <div>
-    Hallo und <NuxtLink :to="link1">Wilkommen zurück</NuxtLink>! Viel Spaß
-    <NuxtLink-2 :to="link2">mit unserer <SelfClosingComponent :prop="nameOfProp" /> App</NuxtLink-2>
-    <library-component> sie uns </library-component> wissen
-  </div>
-</template>
-```
-
-2. Translation string:
-   `"Hallo und <NuxtLink>Wilkommen zurück</NuxtLink>! Viel Spaß <NuxtLink-2>mit unserer <SelfClosingComponent />App</NuxtLink-2><library-component> sie uns </library-component/> wissen"`
-
-3. Using the `RtTranslate` component:
-
-```vue
-<RtTranslate
-  :rt-translate="rtTranslate"
-  i18n-key="name_of_key"
-  :components="{
-    NuxtLink: { to: someLocation },
-    'NuxtLink-2': { to: anoTherLocation, prop2: value },
-    'library-component': {},
-  }"
-  :values="{ valueToInterpolate1: 'test' }"
-/>
-```
-
-### Explanation
-
-Parse a given translation string and return an array of strings and objects e.g. for a key
+For the key:
 
 ```json
-"Wunderbar! <NuxtLink>The customer <strong>{{ customer.name }}</strong></NuxtLink> hat den <NuxtLink-2>Kurs</NuxtLink-2> erfolgreich absolviert."
+"Wunderbar! <Link>The customer <strong>{{ customer.name }}</strong></Link> hat den <Link-2>Kurs</Link-2> erfolgreich absolviert."
 ```
 
-Will return
+The parser returns:
 
 ```ts
 [
   'Wunderbar! ',
   {
-    tag: 'NuxtLink',
+    tag: 'Link',
     content: [
       'The customer ',
       {
@@ -115,7 +77,7 @@ Will return
   },
   ' hat den ',
   {
-    tag: 'NuxtLink-2',
+    tag: 'Link-2',
     content: 'Kurs',
   },
   ' erfolgreich absolviert.',

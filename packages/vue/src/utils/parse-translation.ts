@@ -143,7 +143,6 @@ function isLowercaseHtmlTag(name: string) {
   return /^[a-z]/.test(name);
 }
 
- 
 // function isSelfClosingTag(str: string): boolean {
 //   const selfClosingTags = str.match(i18nRegex.selfClosingTags);
 //   return selfClosingTags ? selfClosingTags.includes(str) : false;
@@ -191,6 +190,7 @@ function parseTranslation(translationString: string): ParsedResult {
     SELF_RE.lastIndex = from;
 
     const paired = PAIRED_RE.exec(translationString);
+
     const self = SELF_RE.exec(translationString);
 
     // choose whichever starts earlier; if equal, prefer paired (so <X>…</X> wins over <X/> at same spot)

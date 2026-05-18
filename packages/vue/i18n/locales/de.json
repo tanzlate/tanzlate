@@ -1,7 +1,7 @@
 {
   "app_namespace": {
     "home": {
-      "welcome": "Willkommen zu Nuxt 3 mit i18next",
+      "welcome": "Willkommen zu Nuxt 3 mit <LangSwitcher>sdsds</LangSwitcher>",
       "description": "Dies ist ein einfaches Beispiel dafür, wie man i18next mit Nuxt 3 und Vue 3 verwendet",
       "interpolationExample": "Dies ist ein Beispiel für Interpolation mit einem <a>Link</a> und einem <strong>strong</strong>-Tag.",
       "componentInterpolationExample": "Dies {{- test}} ist ein Beispiel <ColoredLabel /> für Komponenteninterpolation mit einer <ColoredLabel-1>NICHT GESEHEN</ColoredLabel-1>-Komponente. Und noch mehr Text um zu <a>schauen ob es klappt</a>."

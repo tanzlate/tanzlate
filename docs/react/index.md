@@ -1,31 +1,30 @@
 ---
 title: Getting Started (React)
-titleTemplate: i18next-compose-react
-description: Install and use the React renderer with the RtTranslate component.
+titleTemplate: tanzlate
+description: Install and use the React renderer with the Trans component.
 outline: [2, 3]
 ---
 
 # React Integration
 
-~![NPM Package Version](https://img.shields.io/npm/v/i18next-compose-react?color=519ea9)~
-<span
+![NPM Package Version](https://img.shields.io/npm/v/@tanzlate/react?color=519ea9)
 
-React integration for i18next-compose and [components interpolation](/react/components-interpolation).
+React integration for tanzlate, including [components interpolation](/react/components-interpolation).
 
 ## Installation
 
 ::: code-group
 
 ```bash [npm]
-npm install i18next-compose-vue
+npm install @tanzlate/react
 ```
 
 ```bash [yarn]
-yarn add i18next-compose-vue
+yarn add @tanzlate/react
 ```
 
 ```bash [pnpm]
-pnpm add i18next-compose-vue
+pnpm add @tanzlate/react
 ```
 
 :::
@@ -34,49 +33,36 @@ pnpm add i18next-compose-vue
 
 ### `<I18nProvider>`
 
-The `I18nProvider` is a **Vue wrapper component** that:
+The `I18nProvider` is a **React context provider** that:
 
 - Initializes an i18next instance with the given config.
-- Exposes the i18n context via Vue’s `provide`/`inject`.
-- Wraps your app (or part of it) in a `Suspense` boundary, ensuring translations are ready before render.
+- Exposes the i18n context via React's `createContext`/`useContext`.
+- Bridges language-change events into React state so components re-render automatically.
 
----
+```tsx
+import { I18nProvider } from '@tanzlate/react';
 
-```vue
-<script setup lang="ts">
-import I18nProvider from '@/components/I18nProvider.vue';
-import RtTranslate from 'i18next-compose-vue';
-
-const components = { LangSwitcher };
-</script>
-
-<template>
-  <I18nProvider>
-    <div>
-      <RtTranslate i18n-key="home.welcome" :components="components" />
-    </div>
-  </I18nProvider>
-</template>
+export default function App() {
+  return (
+    <I18nProvider config={i18nConfig}>
+      <MyApp />
+    </I18nProvider>
+  );
+}
 ```
 
-#### Provided Context
+### `useI18n`
 
-Internally, the component:
+```ts
+import { useI18n } from '@tanzlate/react';
 
-- Calls `useI18nContext()` from `@/composables/context`.
-- Runs `initContext(config)`.
-- Provides the i18n context under the `i18nKey` symbol.
-
-This makes reactive translation helpers available to child components.
-
-#### Render Behavior
-
-The provider wraps children in a `<Suspense>` block:
-
-```vue
-<Suspense>
-  <div class="i18n-provider">
-    <slot />
-  </div>
-</Suspense>
+const { cT, globalT, forNamespace, lang, changeLanguage } = useI18n('my_namespace');
 ```
+
+| Return value     | Type                     | Description                                      |
+| ---------------- | ------------------------ | ------------------------------------------------ |
+| `cT`             | `cTFunc`                 | Translation helper scoped to the given namespace |
+| `globalT`        | `cTFunc`                 | Translation helper for the global namespace      |
+| `forNamespace`   | `(ns) => cTFunc`         | Factory to create a helper for any namespace     |
+| `lang`           | `string`                 | Current language                                 |
+| `changeLanguage` | `(lng) => Promise<void>` | Change the active language                       |

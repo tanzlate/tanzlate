@@ -14,10 +14,9 @@
     "noEmit": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "baseUrl": "./src/",
 
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"]
     }
   }
 }

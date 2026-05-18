@@ -1,10 +1,10 @@
 ---
 layout: home
-title: i18next-compose
+title: tanzlate
 titleTemplate: Vanilla JS + Vue + React
 description: Framework-agnostic i18n library with Vue and React renderers for component interpolation.
 hero:
-  name: i18next-compose
+  name: tanzlate
   text: Vanilla JS + Vue + React
   tagline: Component-friendly i18n — parse once, render anywhere.
   actions:
@@ -40,12 +40,11 @@ flowchart LR
 
   F1 --> I
 
-  %% Keep the whole label inside the quotes; use <br/> for new lines
-  C[["@i18next-compose/core<br/>parseTranslationString → AST<br/>resolveInterpolations → AST'"]]
+  C[["@tanzlate/core<br/>parseTranslationString → AST<br/>resolveInterpolations → AST'"]]
 
   subgraph FW["Framework Renderers"]
-    V["@i18next-compose/vue<br /><RtTranslate>"]
-    R["@i18next-compose/react<br /><Trans>"]
+    V["@tanzlate/vue<br /><RtTranslate>"]
+    R["@tanzlate/react<br /><Trans>"]
   end
 
   I -->|string| C
@@ -105,9 +104,6 @@ flowchart LR
   T1 --> T2 --> T3 --> D1
   D1 --> D2 --> D3 --> R1
   R1 --> R2 --> R3 --> R4 --> Q1 --> Q2
-
-  %% Notes
-  click D1 "https://example.com" "_blank"
 ```
 
 ```mermaid

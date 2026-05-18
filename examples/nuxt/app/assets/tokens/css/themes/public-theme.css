@@ -1,0 +1,312 @@
+/**
+ * Theme Overrides
+ * List of CSS variables that can be used to override the default theme
+ * Simply uncomment the variables you want to use
+ */
+:root {
+  /* ------------------------------------------------------------ */
+  /*                            Border                            */
+  /* ------------------------------------------------------------ */
+  --border-width-base: 2px;
+  --border-width-scale: 1.25;
+  --border-width-default: var(--border-width-base);
+  --border-width-xsmall: calc(var(--border-width-base) / 2 * var(--border-width-scale));
+  --border-width-small: calc(var(--border-width-base) * var(--border-width-scale));
+  --border-width-medium: var(--border-width-base);
+  --border-width-large: calc(var(--border-width-base) * 2 * var(--border-width-scale));
+  --border-style-solid: solid;
+  --border-style-dashed: dashed;
+  --border-style-dotted: dotted;
+  --border-style-double: double;
+  --border-style-none: none;
+  --border-style-default: var(--border-style-solid);
+  --border-radius-0: 0;
+  --border-radius-1: 1px;
+  --border-radius-2: 2px;
+  --border-radius-4: 4px;
+  --border-radius-5: 5px;
+  --border-radius-6: 6px;
+  --border-radius-8: 8px;
+  --border-radius-10: 10px;
+  --border-radius-9999: 9999px;
+  --border-radius-scale: 1.5;
+
+  /* ------------------------------------------------------------ */
+  /*                          Breakpoint                          */
+  /* ------------------------------------------------------------ */
+  --breakpoint-xs: 640px;
+  --breakpoint-sm: 768px;
+  --breakpoint-md: 1024px;
+  --breakpoint-lg: 1280px;
+  --breakpoint-xl: 1820px;
+  --breakpoint-xxl: 2520px;
+
+  /* ------------------------------------------------------------ */
+  /*                             Font                             */
+  /* ------------------------------------------------------------ */
+  --font-min-font: 14;
+  --font-max-font: 24;
+  --font-min-viewport: 360;
+  --font-max-viewport: 1280;
+  --font-scale-min: 1.125;
+  --font-scale-max: 1.2;
+  --font-steps: h1, h2, h3, h4, h5, h6, md, sm, xs;
+  --font-weight-thin: 100;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --font-weight-black: 900;
+  --font-line-height-1: 1;
+  --font-line-height-2: 1.1;
+  --font-line-height-3: 1.25;
+  --font-line-height-4: 1.3;
+  --font-line-height-5: 1.35;
+  --font-line-height-6: 1.4;
+  --font-line-height-7: 1.45;
+  --font-line-height-8: 1.5;
+  --font-scale-0: clamp(0.875rem, 0.63rem + 1.087vw, 1.5rem);
+  --font-scale-1: clamp(0.984rem, 0.665rem + 1.418vw, 1.8rem);
+  --font-scale-2: clamp(1.107rem, 0.696rem + 1.831vw, 2.16rem);
+  --font-scale-3: clamp(1.246rem, 0.719rem + 2.341vw, 2.592rem);
+  --font-scale-4: clamp(1.402rem, 0.733rem + 2.972vw, 3.11rem);
+  --font-scale-5: clamp(1.577rem, 0.733rem + 3.749vw, 3.732rem);
+  --font-scale-6: clamp(1.774rem, 0.715rem + 4.705vw, 4.479rem);
+  --font-scale-7: clamp(1.996rem, 0.673rem + 5.877vw, 5.375rem);
+  --font-scale-8: clamp(2.245rem, 0.6rem + 7.312vw, 6.45rem);
+
+  /* ------------------------------------------------------------ */
+  /*                            Shadow                            */
+  /* ------------------------------------------------------------ */
+  --shadow-xs: calc(var(--theme-shadow-base) / 3 * var(--theme-shadow-scale));
+  --shadow-sm: calc(var(--theme-shadow-base) / 2 * var(--theme-shadow-scale));
+  --shadow-md: calc(var(--theme-shadow-base) * var(--theme-shadow-scale));
+  --shadow-lg: calc(var(--theme-shadow-base) * 2 * var(--theme-shadow-scale));
+  --shadow-xl: calc(var(--theme-shadow-base) * 4 * var(--theme-shadow-scale));
+  --shadow-base: 1;
+  --shadow-scale: 1.5;
+
+  /* ------------------------------------------------------------ */
+  /*                            Space                            */
+  /* ------------------------------------------------------------ */
+  --space-fluid-min: 1rem;
+  --space-fluid-max: 1.5rem;
+  --space-fluid-min-viewport: 360px;
+  --space-fluid-max-viewport: 1920px;
+  --space-unit-default: 1rem;
+  --space-unit-fluid: clamp(
+    var(--space-fluid-min),
+    calc(
+      var(--space-fluid-min) + (var(--space-fluid-max) - var(--space-fluid-min)) *
+        (
+          (100vw - var(--space-fluid-min-viewport)) /
+            (var(--space-fluid-max-viewport) - var(--space-fluid-min-viewport))
+        )
+    ),
+    var(--space-fluid-max)
+  );
+  --space-multiplier-unit: 1rem;
+  --space-multiplier-xxs: 0.25;
+  --space-multiplier-xs: 0.5;
+  --space-multiplier-sm: 0.75;
+  --space-multiplier-md: 1;
+  --space-multiplier-lg: 2;
+  --space-multiplier-xl: 3.25;
+  --space-multiplier-xxl: 5.25;
+
+  /* ------------------------------------------------------------ */
+  /*                            Layout                            */
+  /* ------------------------------------------------------------ */
+  --layout-break-at: var(--breakpoint-md);
+  --layout-gutter-sm: var(--spacing-sm);
+  --layout-gutter-md: var(--spacing-md);
+  --layout-gutter-lg: var(--spacing-lg);
+  --layout-gutter-xl: var(--spacing-xl);
+  --layout-direction: column;
+  --layout-align-start: flex-start;
+  --layout-align-center: center;
+  --layout-align-end: flex-end;
+  --layout-justify-start: flex-start;
+  --layout-justify-center: center;
+  --layout-justify-end: flex-end;
+  --layout-justify-between: space-between;
+  --layout-gap-xs: var(--spacing-xs);
+  --layout-gap-sm: var(--spacing-sm);
+  --layout-gap-md: var(--spacing-md);
+  --layout-gap-lg: var(--spacing-lg);
+  --layout-gap-xl: var(--spacing-xl);
+  --layout-overlay-z-index: 1000;
+  --layout-overlay-opacity: -99;
+  --layout-overlay-blur: 8px;
+  --layout-space-unit: var(--space-unit-fluid);
+  --layout-depth-base: 6px;
+  --layout-mobile-padding: var(--spacing-md);
+
+  /* ------------------------------------------------------------ */
+  /*                            Theme                            */
+  /* ------------------------------------------------------------ */
+  --radius: null;
+  --shadow-base: 1;
+  --shadow-base-all: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-scale: 1.5;
+  --stack-index-default: var(--stacking-base);
+  --stack-index-root: var(--stacking-base);
+  --stack-index-overlay: calc(var(--stacking-base) + var(--stacking-scale-ratio));
+  --stack-index-hidden: calc(var(--stacking-base) - var(--stacking-scale-ratio));
+  --opacity-hidden: var(--opacity-0);
+  --opacity-half: var(--opacity-50);
+  --opacity-visible: var(--opacity-100);
+
+  /* ------------------------------------------------------------ */
+  /*                            Radius                            */
+  /* ------------------------------------------------------------ */
+  --radius-light: calc(var(--border-radius-base) / var(--border-radius-scale));
+  --radius-medium: calc(var(--border-radius-base) * var(--border-radius-scale));
+  --radius-heavy: calc(var(--border-radius-base) * 2 * var(--border-radius-scale));
+
+  /* ------------------------------------------------------------ */
+  /*                           Spacing                           */
+  /* ------------------------------------------------------------ */
+  --spacing-xxs: calc(var(--_layout-space-unit) * var(--_space-multiplier-xxs));
+  --spacing-xs: calc(var(--_layout-space-unit) * var(--_space-multiplier-xs));
+  --spacing-sm: calc(var(--_layout-space-unit) * var(--_space-multiplier-sm));
+  --spacing-md: calc(var(--_layout-space-unit) * var(--_space-multiplier-md));
+  --spacing-lg: calc(var(--_layout-space-unit) * var(--_space-multiplier-lg));
+  --spacing-xl: calc(var(--_layout-space-unit) * var(--_space-multiplier-xl));
+  --spacing-xxl: calc(var(--_layout-space-unit) * var(--_space-multiplier-xxl));
+
+  /* ------------------------------------------------------------ */
+  /*                             Text                             */
+  /* ------------------------------------------------------------ */
+  --text-body-size: var(--font-scale-0);
+  --text-body-line-height: 1.5;
+  --text-body-weight: var(--font-weight-regular);
+  --text-caption-size: var(--font-scale-2);
+  --text-caption-line-height: 1.4;
+  --text-caption-weight: var(--font-weight-regular);
+  --text-small-size: var(--font-scale-1);
+  --text-small-line-height: 1.4;
+  --text-small-weight: var(--font-weight-regular);
+
+  /* ------------------------------------------------------------ */
+  /*                           Heading                           */
+  /* ------------------------------------------------------------ */
+  --heading-h1-size: var(--font-scale-4);
+  --heading-h1-line-height: 1.1;
+  --heading-h1-weight: var(--font-weight-bold);
+  --heading-h2-size: var(--font-scale-3);
+  --heading-h2-line-height: 1.15;
+  --heading-h2-weight: var(--font-weight-bold);
+  --heading-h3-size: var(--font-scale-2);
+  --heading-h3-line-height: 1.2;
+  --heading-h3-weight: var(--font-weight-bold);
+  --heading-h4-size: var(--font-scale-1);
+  --heading-h4-line-height: 1.25;
+  --heading-h4-weight: var(--font-weight-bold);
+
+  /* ------------------------------------------------------------ */
+  /*                          Component                          */
+  /* ------------------------------------------------------------ */
+  --component-bg-lightness: calc(
+    var(--color-bg-lightness) + var(--variant-bg-lightness) + var(--state-bg-lightness)
+  );
+  --component-bg-chroma: calc(
+    var(--color-bg-chroma) + var(--variant-bg-chroma) + var(--state-bg-chroma)
+  );
+  --component-bg-hue: calc(var(--color-bg-hue));
+  --component-bg-opacity: calc(
+    var(--color-bg-opacity) + var(--variant-bg-opacity) + var(--state-bg-opacity)
+  );
+  --component-border-lightness: calc(
+    var(--color-border-lightness) + var(--variant-border-lightness) + var(--state-border-lightness)
+  );
+  --component-border-chroma: calc(
+    var(--color-border-chroma) + var(--variant-border-chroma) + var(--state-border-chroma)
+  );
+  --component-border-hue: calc(var(--color-border-hue));
+  --component-border-opacity: calc(
+    var(--color-border-opacity) + var(--variant-border-opacity) + var(--state-border-opacity)
+  );
+  --component-text-lightness: calc(
+    var(--color-text-lightness) + var(--variant-text-lightness) + var(--state-text-lightness)
+  );
+  --component-text-chroma: calc(
+    var(--color-text-chroma) + var(--variant-text-chroma) + var(--state-text-chroma)
+  );
+  --component-text-hue: calc(var(--color-text-hue));
+  --component-text-opacity: calc(
+    var(--color-text-opacity) + var(--variant-text-opacity) + var(--state-text-opacity)
+  );
+  --component-opacity-bg: var(--component-bg-opacity);
+  --component-opacity-border: var(--component-border-opacity);
+  --component-opacity-text: var(--component-text-opacity);
+
+  /* ------------------------------------------------------------ */
+  /*                       Highlighted-text                       */
+  /* ------------------------------------------------------------ */
+  --highlighted-text-gap-min: var(--_spacing-xxs);
+  --highlighted-text-gap-max: var(--_spacing-lg);
+  --highlighted-text-gap-scaler: 1.4svw;
+  --highlighted-text-gap-left: clamp(
+    var(--_highlighted-text-gap-min),
+    var(--_highlighted-text-gap-scaler),
+    var(--_highlighted-text-gap-max)
+  );
+
+  /* ------------------------------------------------------------ */
+  /*                             Cube                             */
+  /* ------------------------------------------------------------ */
+
+  /* -------------------- */
+  /*        Global        */
+  /* -------------------- */
+  --gutter: var(--layout-gutter-sm);
+  --on: var(--is-toggled);
+  --off: var(--is-not-toggled);
+
+  /* -------------------- */
+  /*     Composition     */
+  /* -------------------- */
+  --flow-space: var(--gutter);
+  --stack-gap: var(--gutter);
+  --stack-align: start;
+  --stack-direction: var(--layout-direction);
+  --cluster-gap: var(--gutter);
+  --cluster-align: center;
+  --center-max-width: 72ch;
+  --center-padding-inline: var(--gutter);
+  --switcher-modifier: var(--layout-break-at);
+  --switcher-gap: var(--gutter);
+
+  /* -------------------- */
+  /*        Block        */
+  /* -------------------- */
+  --block-padding-x: var(--spacing-xs);
+  --block-padding-y: var(--spacing-md);
+  --block-padding: var(--block-padding-y) var(--block-padding-x);
+  --card-bg: var(--color-bg-neutral);
+  --card-border: var(--color-border-subtle);
+  --card-radius: var(--border-radius-medium);
+  --card-padding: var(--cube-block-block-padding);
+  --button-padding-x: var(--spacing-xs);
+  --button-padding-y: var(--spacing-md);
+  --button-radius: var(--border-radius-medium);
+  --button-text: var(--color-text-primary);
+  --button-bg: var(--color-bg-primary);
+  --button-bg-hover: var(--color-bg-primary-hover);
+  --checkbox-bg: var(--color-bg-primary);
+  --checkbox-padding: var(--spacing-xs);
+  --dialog-bg: var(--color-bg-neutral);
+  --dialog-border: var(--color-border-subtle);
+  --dialog-radius: var(--border-radius-large);
+  --dialog-padding: var(--spacing-lg);
+  --dialog-stacking-index: var(--stacking-overlay);
+  --dialog-opacity: var(--opacity-100);
+  --menu-gap: var(--spacing-md);
+  --menu-gap-dense: var(--spacing-sm);
+  --menu-padding-top: var(--spacing-md);
+  --menu-padding-bottom: var(--spacing-md);
+  --menu-padding-top-dense: var(--spacing-sm);
+  --menu-padding-bottom-dense: var(--spacing-sm);
+  --menu-stacking-index: var(--stacking-overlay);
+}

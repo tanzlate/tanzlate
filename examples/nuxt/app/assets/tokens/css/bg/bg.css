@@ -1,0 +1,75 @@
+/**
+ * Do not edit directly, this file was auto-generated.
+ */
+
+:root {
+  --color-bg-page: #c0bfa7;
+  --color-bg-subtle: #e8e7ca;
+  --color-bg-elevated: #ffffff;
+  --color-bg-inset: #c0bfa7;
+  --color-bg-primary: #155180;
+  --color-bg-primary-hover: oklch(from #155180 lightness(+7%));
+  --color-bg-primary-active: #021222;
+  --color-bg-primary-subtle: #d5e5fd;
+  --color-bg-accent: #414956;
+  --color-bg-accent-hover: #242931;
+  --color-bg-accent-subtle: #d8dde5;
+  --color-bg-neutral: #64cae9;
+  --color-bg-neutral-strong: #030b0e;
+  --color-bg-info: #ade0fd;
+  --color-bg-warning: #d5e5fd;
+  --color-bg-success: #c8eaf9;
+  --color-bg-secondary-lightness: var(--color-secondary-lightness, 0);
+  --color-bg-secondary-chroma: var(--color-secondary-chroma, 0);
+  --color-bg-secondary-hue: var(--color-secondary-hue, 0);
+  --color-bg-secondary-opacity: var(--color-secondary-opacity, 0);
+  --color-bg-secondary: oklch(
+    var(--color-bg-secondary-lightness) var(--color-bg-secondary-chroma)
+      var(--color-bg-secondary-hue) / var(--color-bg-secondary-opacity)
+  );
+  --color-bg-danger-lightness: var(--color-danger-lightness, 0);
+  --color-bg-danger-chroma: var(--color-danger-chroma, 0);
+  --color-bg-danger-hue: var(--color-danger-hue, 0);
+  --color-bg-danger-opacity: var(--color-danger-opacity, 1);
+  --color-bg-danger: oklch(
+    var(--color-bg-danger-lightness) var(--color-bg-danger-chroma) var(--color-bg-danger-hue) /
+      var(--color-bg-danger-opacity)
+  );
+  --color-bg-hue: var(--color-primary-hue) * var(--primary, 1) + var(--color-secondary-hue) *
+    var(--secondary, 0) + var(--color-danger-hue) * var(--danger, 0);
+  --color-bg-h: var(--theme-color-bg-hue);
+  --color-bg-lightness: var(--color-primary-lightness) * var(--primary, 1) +
+    var(--color-secondary-lightness) * var(--secondary, 0) + var(--color-danger-lightness) *
+    var(--danger, 0);
+  --color-bg-l: var(--theme-color-bg-lightness);
+  --color-bg-opacity: var(--color-primary-opacity);
+  --color-bg-o: var(--theme-color-bg-opacity);
+  --bg-primary: #155180;
+  --bg-primary-hover: #09304e;
+  --bg-primary-active: #021222;
+  --bg-primary-focus: #d5e5fd;
+  --bg-primary-disable: #d5e5fd;
+  --bg-accent: #414956;
+  --bg-accent-hover: #242931;
+  --bg-accent-active: #0e1116;
+  --bg-accent-focus: #d8dde5;
+  --bg-accent-disable: #d8dde5;
+  --bg-neutral: #64cae9;
+  --bg-neutral-hover: #14333c;
+  --bg-neutral-active: #051318;
+  --bg-neutral-focus: #c8eaf9;
+  --bg-neutral-disable: #c8eaf9;
+  --bg-info: #d8dde5;
+  --bg-warning: #d5e5fd;
+  --bg-success: #c8eaf9;
+  --component-bg-lightness: calc(
+    var(--color-bg-lightness) + var(--variant-bg-lightness) + var(--state-bg-lightness)
+  );
+  --component-bg-chroma: calc(
+    var(--color-bg-chroma) + var(--variant-bg-chroma) + var(--state-bg-chroma)
+  );
+  --component-bg-hue: calc(var(--color-bg-hue));
+  --component-bg-opacity: calc(
+    var(--color-bg-opacity) + var(--variant-bg-opacity) + var(--state-bg-opacity)
+  );
+}

@@ -1,0 +1,11 @@
+{
+  "app_namespace": {
+    "home": {
+      "welcome": "Willkommen bei tanzlate mit <LangSwitcher>Sprache wechseln</LangSwitcher>",
+      "description": "Ein einfaches <b>Beispiel</b> für tanzlate in einer Nuxt App",
+      "interpolationExample": "Interpolation mit einem <a>Link</a> und einem <strong>strong</strong>-Tag.",
+      "componentInterpolationExample": "Ein Beispiel für <ColoredLabel /> Komponenten-<b>Interpolation</b> mit einer <ColoredLabel-1>farbigen Beschriftung</ColoredLabel-1>. Und ein <a>Link</a>.",
+      "lesson_sidebar_text": "Der Kurs <span class=\"text-primary\">\"{{name}}\"</span> ist auf <span class=\"text-primary\">\"{{ courseVisibility }}\"</span> gesetzt. Die Sichtbarkeitseinstellung hier betrifft nur diese Lektion und hat keinen Einfluss auf den Kurs."
+    }
+  }
+}

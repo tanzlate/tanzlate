@@ -1,19 +1,20 @@
 {
-  "name": "i18next-compose-vue",
+  "name": "@tanzlate/vue",
   "version": "0.1.0",
   "private": false,
   "scripts": {
     "build": "run-p type-check \"build-only {@}\" --",
     "build-only": "vite build",
-    "dev": "vite",
+    "dev": "vite ./src/internal-playground",
     "preview": "vite preview",
     "test:e2e": "playwright test",
     "test:unit": "vitest",
     "type-check": "vue-tsc --build"
   },
   "dependencies": {
+    "@tanzlate/core": "workspace:*",
+    "@tanzlate/vanilla": "workspace:*",
     "i18next": "25.8.0",
-    "i18next-compose": "workspace:*",
     "vue": "3.5.18"
   },
   "devDependencies": {
@@ -55,7 +56,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/use-compose/i18next-compose"
+    "url": "https://github.com/tanzlate/i18next-compose"
   },
   "type": "module",
   "types": "dist/index.d.ts"
