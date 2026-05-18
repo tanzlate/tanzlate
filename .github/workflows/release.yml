@@ -34,13 +34,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Build
+        run: pnpm build
+
       - name: Create Release Pull Request or Publish
         uses: changesets/action@v1
         with:
+          version: pnpm changeset version
           publish: pnpm release
+          createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
 
-      - name: Push the release tags back
+      - name: Push tags
+        if: ${{ steps.changesets.outputs.published == 'true' }}
         run: git push --follow-tags
