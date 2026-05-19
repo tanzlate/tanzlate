@@ -28,7 +28,7 @@
     "prepare": "husky",
     "preview": "pnpm --filter @tanzlate/vanilla preview",
     "preview:vue": "pnpm --filter=@tanzlate/vue preview",
-    "release": "pnpm build && pnpm changeset:publish",
+    "release": "changeset publish",
     "release:snapshot": "pnpm build && pnpm changeset:snapshot",
     "syncpack": "pnpm syncpack:fix && pnpm syncpack:format",
     "syncpack:fix": "syncpack fix --dependency-types prod,dev",
