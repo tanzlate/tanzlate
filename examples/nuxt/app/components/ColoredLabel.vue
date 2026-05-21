@@ -6,16 +6,10 @@
 </template>
 
 <script setup lang="ts">
-const { color } = withDefaults(
-  defineProps<{
-    color: string;
-    label: string;
-  }>(),
-  {
-    color: '#ccc',
-    label: 'Default Label',
-  },
-);
+const { color = '#ccc', label = 'Default Label' } = defineProps<{
+  color?: string;
+  label?: string;
+}>();
 </script>
 
 <style scoped>
