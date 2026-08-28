@@ -14,8 +14,8 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from '@/composables';
 import { getFlagEmoji } from '@tanzlate/vanilla';
+import { useI18n } from '../composables';
 
 const props = defineProps<{
   label?: string;
