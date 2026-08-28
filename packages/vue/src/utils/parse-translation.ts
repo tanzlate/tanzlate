@@ -221,7 +221,7 @@ function parseTranslation(translationString: string): ParsedResult {
     }
     node.content = areComponentsPresent(closed.inner)
       ? (parseTranslation(closed.inner) as TagObject[])
-      : closed.inner.trim();
+      : closed.inner;
 
     result.push(node);
     cursor = closed.end;
