@@ -21,13 +21,21 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
           registry-url: https://registry.npmjs.org
 
-      - name: Enable Corepack (pnpm)
+      # `corepack enable` with no argument also shims `npm`, which would shadow the
+      # npm upgrade below. Only shim pnpm.
+      - name: Enable Corepack (pnpm only)
+        run: corepack enable pnpm
+
+      # npm OIDC trusted publishing requires npm >= 11.5.1. setup-node ships npm 10.x,
+      # which has no trusted-publishing support, so the publish goes out unauthenticated
+      # and npm answers E404 (it masks 403 as 404 for existing packages).
+      - name: Toolchain for OIDC trusted publishing
         run: |
-          corepack enable
           corepack prepare pnpm@10 --activate
+          npm install -g npm@latest
           npm --version
           pnpm --version
 
