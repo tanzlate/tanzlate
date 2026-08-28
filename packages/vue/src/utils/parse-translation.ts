@@ -2,7 +2,6 @@ export {
   areComponentsPresent,
   hasManyChildren,
   isLowercaseHtmlTag,
-  parseAttributes,
   parseTranslation,
   removeNumberSuffix,
 };
@@ -20,24 +19,21 @@ const TAG_NAME = '[A-Za-z][\\w-]*';
 const ANY_TAG = new RegExp(`</?${TAG_NAME}\\s*[^>]*/?>`, 'g');
 
 /**
- * Matches a single tag, consuming quoted attribute values as a unit so that a `>` inside
- * an attribute (`title="a > b"`) does not terminate the tag early.
+ * Matches a single tag.
  *
- * Groups: 1 = leading slash (closing tag), 2 = tag name, 3 = attributes, 4 = trailing slash.
+ * Tags in a translation string carry no attributes by design -- they exist so a translator
+ * can read `<UserName />` in a natural sentence, and every prop comes from the `components`
+ * map at the usage site. Quoted runs are still consumed as a unit so that a stray `>` inside
+ * one cannot terminate a tag early and split the sentence.
+ *
+ * Groups: 1 = leading slash (closing tag), 2 = tag name, 3 = discarded, 4 = trailing slash.
  */
 const TOKEN = new RegExp(`<(/)?(${TAG_NAME})((?:"[^"]*"|'[^']*'|[^>])*?)(/)?>`, 'g');
 
-/**
- * A parsed tag.
- *
- * `attributes` holds any attributes written inline in the translation string, e.g.
- * `<a href="/help">`. In Vue 3 these go into the same object as props, so the renderer
- * merges them with the `components` map -- which wins on conflict.
- */
+/** A parsed tag. Props are never carried here -- they come from the `components` map. */
 interface TagObject {
   tag: string;
   content?: TagObject[] | string;
-  attributes?: Record<string, string>;
 }
 
 interface FlatComponent {
@@ -50,7 +46,6 @@ type ParsedResult = (string | TagObject)[];
 interface Token {
   kind: 'open' | 'close' | 'self';
   tag: string;
-  attributes: string;
   start: number;
   end: number;
 }
@@ -77,29 +72,6 @@ function areComponentsPresent(translationString: string): string[] | null {
   return translationString.match(ANY_TAG);
 }
 
-/**
- * Splits a raw attribute list into a record.
- *
- * Handles `name="value"`, `name='value'` and valueless `name` (which becomes `''`, matching
- * how HTML boolean attributes behave). Anything unparseable is skipped rather than throwing.
- */
-function parseAttributes(raw: string): Record<string, string> | undefined {
-  if (!raw) {
-    return undefined;
-  }
-
-  const attrs: Record<string, string> = {};
-  const ATTR = /([:@]?[A-Za-z_][\w:.-]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+)))?/g;
-
-  let match: RegExpExecArray | null;
-  while ((match = ATTR.exec(raw)) !== null) {
-    const [, name, dq, sq, bare] = match;
-    attrs[name] = dq ?? sq ?? bare ?? '';
-  }
-
-  return Object.keys(attrs).length > 0 ? attrs : undefined;
-}
-
 /** A lowercase first letter means a native HTML element rather than a component. */
 function isLowercaseHtmlTag(name: string): boolean {
   return /^[a-z]/.test(name);
@@ -113,12 +85,11 @@ function nextToken(input: string, from: number): Token | null {
     return null;
   }
 
-  const [raw, closing, tag, rawAttrs, selfClosing] = m;
+  const [raw, closing, tag, , selfClosing] = m;
 
   return {
     kind: closing ? 'close' : selfClosing ? 'self' : 'open',
     tag,
-    attributes: (rawAttrs ?? '').trim(),
     start: m.index,
     end: m.index + raw.length,
   };
@@ -199,8 +170,7 @@ function parseTranslation(translationString: string): ParsedResult {
     }
 
     if (token.kind === 'self') {
-      const attributes = parseAttributes(token.attributes);
-      result.push(attributes ? { tag: token.tag, attributes } : { tag: token.tag });
+      result.push({ tag: token.tag });
       cursor = token.end;
       continue;
     }
@@ -215,13 +185,9 @@ function parseTranslation(translationString: string): ParsedResult {
     }
 
     const node: TagObject = { tag: token.tag };
-    const attributes = parseAttributes(token.attributes);
-    if (attributes) {
-      node.attributes = attributes;
-    }
     node.content = areComponentsPresent(closed.inner)
       ? (parseTranslation(closed.inner) as TagObject[])
-      : closed.inner;
+      : closed.inner.trim();
 
     result.push(node);
     cursor = closed.end;

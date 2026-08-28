@@ -162,13 +162,7 @@ export default defineComponent({
       const original = element.tag; // e.g. "ColoredLabel-1" or "strong"
       const fileName = removeNumberSuffix(original); // "ColoredLabel"
 
-      // In Vue 3 attributes and props share one object: declared props bind as props,
-      // the rest fall through as attributes. Attributes written in the translation string
-      // are merged first so that `:components` wins on conflict.
-      const inlineAttrs = element.attributes;
-      const mapped = props.components[original] ?? undefined;
-      const componentProps =
-        inlineAttrs || mapped ? { ...(inlineAttrs ?? {}), ...(mapped ?? {}) } : undefined;
+      const componentProps = props.components[original] ?? undefined;
 
       // If the component content contains other nested tags, we recursively render them
       const elementContent = normalizeChildren(element.content) || [];

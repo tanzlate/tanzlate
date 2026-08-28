@@ -41,20 +41,6 @@ function renderWith(tZ: () => string, components: Record<string, unknown> = {}) 
 const render = (str: string, components: Record<string, unknown> = {}) =>
   renderWith(() => str, components)();
 
-describe('attributes written in the translation string', () => {
-  it('renders href and target on a plain HTML tag', () => {
-    expect(render('a <a target="_blank" href="https://reteach.io">link</a>')).toContain(
-      '<a target="_blank" href="https://reteach.io">link</a>',
-    );
-  });
-
-  it('lets :components override an inline attribute', () => {
-    expect(
-      render('<a href="https://from-string.example">x</a>', { a: { href: '/from-prop' } }),
-    ).toContain('href="/from-prop"');
-  });
-});
-
 describe('unregistered component', () => {
   it('warns and still renders its children instead of an empty placeholder', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});

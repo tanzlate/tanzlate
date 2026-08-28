@@ -3,7 +3,6 @@ import {
   areComponentsPresent,
   hasManyChildren,
   isLowercaseHtmlTag,
-  parseAttributes,
   parseTranslation,
   removeNumberSuffix,
 } from './parse-translation';
@@ -68,23 +67,26 @@ describe('parseTranslation', () => {
     });
   });
 
-  describe('attributes', () => {
-    it('captures attributes without rendering them', () => {
+  describe('attributes are not part of the format', () => {
+    /*
+     * Tags exist so a translator can read `<UserName />` in a sentence. Props come from the
+     * `components` map at the usage site, never from the string. A tag that carries an
+     * attribute anyway still resolves -- the attribute is simply discarded.
+     */
+    it('discards an attribute written in the string', () => {
       expect(parseTranslation('<a href="https://x.com">link</a>')).toEqual([
-        { tag: 'a', attributes: { href: 'https://x.com' }, content: 'link' },
+        { tag: 'a', content: 'link' },
       ]);
     });
 
-    it('does not end the tag on a > inside a quoted attribute value', () => {
+    it('does not end the tag on a > inside a quoted run', () => {
       expect(parseTranslation('<span title="a > b">text</span>')).toEqual([
-        { tag: 'span', attributes: { title: 'a > b' }, content: 'text' },
+        { tag: 'span', content: 'text' },
       ]);
     });
 
-    it('captures attributes on self-closing tags', () => {
-      expect(parseTranslation('<Icon name="check" />')).toEqual([
-        { tag: 'Icon', attributes: { name: 'check' } },
-      ]);
+    it('discards attributes on a self-closing tag', () => {
+      expect(parseTranslation('<Icon name="check" />')).toEqual([{ tag: 'Icon' }]);
     });
   });
 
@@ -105,35 +107,6 @@ describe('parseTranslation', () => {
         content: [{ tag: 'b', content: ['bold ', { tag: 'i', content: 'and italic' }] }],
       },
     ]);
-  });
-});
-
-describe('parseAttributes', () => {
-  it('returns undefined for an empty attribute list', () => {
-    expect(parseAttributes('')).toBeUndefined();
-  });
-
-  it('parses double- and single-quoted values', () => {
-    expect(parseAttributes(`href="/a" title='b'`)).toEqual({ href: '/a', title: 'b' });
-  });
-
-  it('parses an unquoted value', () => {
-    expect(parseAttributes('target=_blank')).toEqual({ target: '_blank' });
-  });
-
-  it('treats a valueless attribute as an empty string', () => {
-    expect(parseAttributes('disabled')).toEqual({ disabled: '' });
-  });
-
-  it('keeps a value containing a >', () => {
-    expect(parseAttributes('title="a > b"')).toEqual({ title: 'a > b' });
-  });
-
-  it('parses several attributes at once', () => {
-    expect(parseAttributes('target="_blank" href="https://x.com"')).toEqual({
-      target: '_blank',
-      href: 'https://x.com',
-    });
   });
 });
 
