@@ -2,6 +2,7 @@ export {
   areComponentsPresent,
   hasManyChildren,
   isLowercaseHtmlTag,
+  parseAttributes,
   parseTranslation,
   removeNumberSuffix,
 };
@@ -29,14 +30,14 @@ const TOKEN = new RegExp(`<(/)?(${TAG_NAME})((?:"[^"]*"|'[^']*'|[^>])*?)(/)?>`, 
 /**
  * A parsed tag.
  *
- * `attributes` is captured for completeness but is not rendered: props come from the
- * `components` map on `<Tanzlate>` and from the component registry, so translators never
- * have to edit URLs or prop values inside a translation string.
+ * `attributes` holds any attributes written inline in the translation string, e.g.
+ * `<a href="/help">`. In Vue 3 these go into the same object as props, so the renderer
+ * merges them with the `components` map -- which wins on conflict.
  */
 interface TagObject {
   tag: string;
   content?: TagObject[] | string;
-  attributes?: string;
+  attributes?: Record<string, string>;
 }
 
 interface FlatComponent {
@@ -74,6 +75,29 @@ function removeNumberSuffix(str: string): string {
 function areComponentsPresent(translationString: string): string[] | null {
   ANY_TAG.lastIndex = 0;
   return translationString.match(ANY_TAG);
+}
+
+/**
+ * Splits a raw attribute list into a record.
+ *
+ * Handles `name="value"`, `name='value'` and valueless `name` (which becomes `''`, matching
+ * how HTML boolean attributes behave). Anything unparseable is skipped rather than throwing.
+ */
+function parseAttributes(raw: string): Record<string, string> | undefined {
+  if (!raw) {
+    return undefined;
+  }
+
+  const attrs: Record<string, string> = {};
+  const ATTR = /([:@]?[A-Za-z_][\w:.-]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+)))?/g;
+
+  let match: RegExpExecArray | null;
+  while ((match = ATTR.exec(raw)) !== null) {
+    const [, name, dq, sq, bare] = match;
+    attrs[name] = dq ?? sq ?? bare ?? '';
+  }
+
+  return Object.keys(attrs).length > 0 ? attrs : undefined;
 }
 
 /** A lowercase first letter means a native HTML element rather than a component. */
@@ -175,9 +199,8 @@ function parseTranslation(translationString: string): ParsedResult {
     }
 
     if (token.kind === 'self') {
-      result.push(
-        token.attributes ? { tag: token.tag, attributes: token.attributes } : { tag: token.tag },
-      );
+      const attributes = parseAttributes(token.attributes);
+      result.push(attributes ? { tag: token.tag, attributes } : { tag: token.tag });
       cursor = token.end;
       continue;
     }
@@ -192,8 +215,9 @@ function parseTranslation(translationString: string): ParsedResult {
     }
 
     const node: TagObject = { tag: token.tag };
-    if (token.attributes) {
-      node.attributes = token.attributes;
+    const attributes = parseAttributes(token.attributes);
+    if (attributes) {
+      node.attributes = attributes;
     }
     node.content = areComponentsPresent(closed.inner)
       ? (parseTranslation(closed.inner) as TagObject[])
