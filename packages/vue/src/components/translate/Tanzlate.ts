@@ -19,16 +19,22 @@ import {
   removeNumberSuffix,
   TagObject,
 } from '../../utils/parse-translation';
+import { isSafeUrl, URL_ATTRIBUTES } from '../../utils/sanitize-url';
 import { resolveRegistered } from './component-registry';
 
-type ComponentsProps = VNodeProps &
+/** One entry of the `components` map: attrs, event handlers, and props for a tag. */
+type ComponentConfig = VNodeProps &
   HTMLAttributes & {
-    [name: string]: (VNodeProps & HTMLAttributes & { [key: string]: unknown }) | null;
+    attrs?: Record<string, unknown>;
+    on?: Record<string, (...args: never[]) => unknown>;
+    [key: string]: unknown;
   };
+
+type ComponentsProps = Record<string, ComponentConfig | null>;
 
 const warned = new Set<string>();
 
-/** Emits a warning once per message, so a component in a loop does not flood the console. */
+// Once per message, so a component in a loop doesn't flood the console.
 function warnOnce(message: string): void {
   if (warned.has(message)) {
     return;
@@ -36,6 +42,43 @@ function warnOnce(message: string): void {
   warned.add(message);
   // eslint-disable-next-line no-console
   console.warn(message);
+}
+
+/**
+ * Splits a `components` entry into what h() wants.
+ *
+ * `{ attrs, on, ...props }` -- attrs are applied as-is, `on` keys become onClick-style
+ * listeners, everything else is a prop. URL attributes are checked before rendering.
+ */
+function resolveConfig(config: ComponentConfig | null | undefined) {
+  if (!config) {
+    return undefined;
+  }
+
+  const { attrs, on, ...componentProps } = config;
+  const data: Record<string, unknown> = { ...componentProps };
+
+  if (attrs) {
+    for (const [name, value] of Object.entries(attrs)) {
+      if (
+        URL_ATTRIBUTES.has(name.toLowerCase()) &&
+        typeof value === 'string' &&
+        !isSafeUrl(value)
+      ) {
+        warnOnce(`[tanzlate] dropped unsafe "${name}" URL.`);
+        continue;
+      }
+      data[name] = value;
+    }
+  }
+
+  if (on) {
+    for (const [event, handler] of Object.entries(on)) {
+      data[`on${event.charAt(0).toUpperCase()}${event.slice(1)}`] = handler;
+    }
+  }
+
+  return Object.keys(data).length > 0 ? data : undefined;
 }
 
 export default defineComponent({
@@ -162,7 +205,7 @@ export default defineComponent({
       const original = element.tag; // e.g. "ColoredLabel-1" or "strong"
       const fileName = removeNumberSuffix(original); // "ColoredLabel"
 
-      const componentProps = props.components[original] ?? undefined;
+      const componentProps = resolveConfig(props.components[original]);
 
       // If the component content contains other nested tags, we recursively render them
       const elementContent = normalizeChildren(element.content) || [];

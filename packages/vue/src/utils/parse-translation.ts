@@ -15,18 +15,12 @@ export type { FlatComponent, ParsedResult, TagObject };
  */
 const TAG_NAME = '[A-Za-z][\\w-]*';
 
-/** Matches an opening, closing, or self-closing tag. Used only to *detect* that tags exist. */
+// Only used to detect whether a string contains any tag at all.
 const ANY_TAG = new RegExp(`</?${TAG_NAME}\\s*[^>]*/?>`, 'g');
 
 /**
- * Matches a single tag.
- *
- * Tags in a translation string carry no attributes by design -- they exist so a translator
- * can read `<UserName />` in a natural sentence, and every prop comes from the `components`
- * map at the usage site. Quoted runs are still consumed as a unit so that a stray `>` inside
- * one cannot terminate a tag early and split the sentence.
- *
- * Groups: 1 = leading slash (closing tag), 2 = tag name, 3 = discarded, 4 = trailing slash.
+ * Matches a single tag. Quoted runs are consumed whole so a stray `>` inside one can't
+ * end the tag early. Groups: 1 closing slash, 2 name, 3 ignored, 4 self-closing slash.
  */
 const TOKEN = new RegExp(`<(/)?(${TAG_NAME})((?:"[^"]*"|'[^']*'|[^>])*?)(/)?>`, 'g');
 
@@ -50,7 +44,7 @@ interface Token {
   end: number;
 }
 
-/** True when a parsed tag holds child tokens rather than a plain string. */
+// True when the tag holds child tokens rather than a plain string.
 function hasManyChildren(element: TagObject): boolean {
   if (!element.content) {
     return false;
@@ -66,18 +60,21 @@ function removeNumberSuffix(str: string): string {
   return str.replace(/-\d+$/, '');
 }
 
-/** Returns every tag found in the string, or null when there are none. */
+/*
+ * Array of the tags found, or null.
+ * Example: ["<NuxtLink>", "</NuxtLink>"]
+ */
 function areComponentsPresent(translationString: string): string[] | null {
   ANY_TAG.lastIndex = 0;
   return translationString.match(ANY_TAG);
 }
 
-/** A lowercase first letter means a native HTML element rather than a component. */
+// Lowercase first letter means a native HTML element, not a component.
 function isLowercaseHtmlTag(name: string): boolean {
   return /^[a-z]/.test(name);
 }
 
-/** Reads the next tag at or after `from`, or null when none remains. */
+// Next tag at or after `from`, or null.
 function nextToken(input: string, from: number): Token | null {
   TOKEN.lastIndex = from;
   const m = TOKEN.exec(input);
@@ -95,11 +92,9 @@ function nextToken(input: string, from: number): Token | null {
   };
 }
 
-/**
- * Finds the `</tag>` that closes the tag opened at `from`, counting nested occurrences of
- * the same name so that `<b>a <b>c</b> d</b>` closes on the outer `</b>`, not the inner one.
- *
- * Returns null when the tag is never closed.
+/*
+ * Counts depth so `<b>a <b>c</b> d</b>` closes on the outer `</b>`, not the inner one.
+ * Null when the tag is never closed.
  */
 function findClosing(
   input: string,
@@ -142,8 +137,8 @@ function findClosing(
  * //   '.',
  * // ]
  *
- * Unclosed and stray closing tags are emitted as literal text rather than throwing, so a
- * malformed translation degrades to plain text instead of rendering nothing.
+ * Unclosed and stray closing tags come back as literal text, so a malformed translation
+ * degrades to plain text instead of rendering nothing.
  */
 function parseTranslation(translationString: string): ParsedResult {
   const result: ParsedResult = [];
@@ -155,7 +150,7 @@ function parseTranslation(translationString: string): ParsedResult {
       break;
     }
 
-    // A stray `</tag>` with no opener: keep it as text and move past it.
+    // Stray `</tag>` with no opener: keep as text.
     if (token.kind === 'close') {
       if (token.start > cursor) {
         result.push(translationString.slice(cursor, token.start));
@@ -177,7 +172,7 @@ function parseTranslation(translationString: string): ParsedResult {
 
     const closed = findClosing(translationString, token.tag, token.end);
 
-    // Opened but never closed: emit the raw tag as text so the sentence survives.
+    // Opened, never closed: keep the raw tag as text so the sentence survives.
     if (!closed) {
       result.push(translationString.slice(token.start, token.end));
       cursor = token.end;
