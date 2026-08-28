@@ -1,5 +1,17 @@
 # i18next-compose-vue
 
+## 0.3.0
+
+### Minor Changes
+
+- 349e0b0: Update tanzlate
+
+### Patch Changes
+
+- Updated dependencies [349e0b0]
+  - @tanzlate/core@0.3.0
+  - @tanzlate/vanilla@0.4.0
+
 ## 0.2.0
 
 ### Minor Changes

@@ -1,3 +1,16 @@
+import { TFunc } from '@tanzlate/core';
+import type { TOptions } from 'i18next';
+import { isString } from 'unreadable-typescript';
+import {
+  computed,
+  defineComponent,
+  Fragment,
+  h,
+  HTMLAttributes,
+  PropType,
+  VNode,
+  VNodeProps,
+} from 'vue';
 import {
   areComponentsPresent,
   isLowercaseHtmlTag,
@@ -5,26 +18,68 @@ import {
   parseTranslation,
   removeNumberSuffix,
   TagObject,
-} from '@/utils/parse-translation';
-import { TFunc } from '@tanzlate/core';
-import { TOptions } from 'i18next';
-import { isString } from 'unreadable-typescript';
-import {
-  computed,
-  defineAsyncComponent,
-  defineComponent,
-  h,
-  HTMLAttributes,
-  PropType,
-  VNode,
-  VNodeProps,
-} from 'vue';
+} from '../../utils/parse-translation';
+import { isSafeUrl, URL_ATTRIBUTES } from '../../utils/sanitize-url';
 import { resolveRegistered } from './component-registry';
 
-type ComponentsProps = VNodeProps &
+/** One entry of the `components` map: attrs, event handlers, and props for a tag. */
+type ComponentConfig = VNodeProps &
   HTMLAttributes & {
-    [name: string]: (VNodeProps & HTMLAttributes & { [key: string]: unknown }) | null;
+    attrs?: Record<string, unknown>;
+    on?: Record<string, (...args: never[]) => unknown>;
+    [key: string]: unknown;
   };
+
+type ComponentsProps = Record<string, ComponentConfig | null>;
+
+const warned = new Set<string>();
+
+// Once per message, so a component in a loop doesn't flood the console.
+function warnOnce(message: string): void {
+  if (warned.has(message)) {
+    return;
+  }
+  warned.add(message);
+  // eslint-disable-next-line no-console
+  console.warn(message);
+}
+
+/**
+ * Splits a `components` entry into what h() wants.
+ *
+ * `{ attrs, on, ...props }` -- attrs are applied as-is, `on` keys become onClick-style
+ * listeners, everything else is a prop. URL attributes are checked before rendering.
+ */
+function resolveConfig(config: ComponentConfig | null | undefined) {
+  if (!config) {
+    return undefined;
+  }
+
+  const { attrs, on, ...componentProps } = config;
+  const data: Record<string, unknown> = { ...componentProps };
+
+  if (attrs) {
+    for (const [name, value] of Object.entries(attrs)) {
+      if (
+        URL_ATTRIBUTES.has(name.toLowerCase()) &&
+        typeof value === 'string' &&
+        !isSafeUrl(value)
+      ) {
+        warnOnce(`[tanzlate] dropped unsafe "${name}" URL.`);
+        continue;
+      }
+      data[name] = value;
+    }
+  }
+
+  if (on) {
+    for (const [event, handler] of Object.entries(on)) {
+      data[`on${event.charAt(0).toUpperCase()}${event.slice(1)}`] = handler;
+    }
+  }
+
+  return Object.keys(data).length > 0 ? data : undefined;
+}
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
@@ -113,13 +168,12 @@ export default defineComponent({
       parseTranslation(translationValue.value),
     );
 
-    /**
-     * 2. If no tags are present, we return the translation string
-     * Meaning this component could be used as a simple translation component
+    /*
+     * NOTE: the tags/no-tags decision must NOT be made here. `setup` runs once, so an early
+     * return would freeze it for the component's lifetime -- a key that is untagged in the
+     * first language and tagged in the next would never render its components after a
+     * language switch. The render function below re-reads `hasTags` on every run instead.
      */
-    if (!areComponentsPresent(translationValue.value)) {
-      return () => translationValue.value;
-    }
 
     /**
      * Normalize children components
@@ -151,7 +205,7 @@ export default defineComponent({
       const original = element.tag; // e.g. "ColoredLabel-1" or "strong"
       const fileName = removeNumberSuffix(original); // "ColoredLabel"
 
-      const componentProps = props.components[original] ?? undefined;
+      const componentProps = resolveConfig(props.components[original]);
 
       // If the component content contains other nested tags, we recursively render them
       const elementContent = normalizeChildren(element.content) || [];
@@ -171,18 +225,19 @@ export default defineComponent({
         return h(htmlTag, componentProps, elementContent);
       }
 
-      // TODO: ?
-      // Extract event listeners (e.g., @click)
-      // const eventListeners = props?.value.onClick || {};
-      const ElementComponent = defineAsyncComponent(() => import(`@/components/${fileName}.vue`));
-
-      return h(
-        ElementComponent,
-        componentProps,
-        // attrs,
-        // on: eventListeners,
-        elementContent,
+      /*
+       * Unregistered, and not an HTML tag. There is nothing to resolve: a dynamic import
+       * from this package would resolve against tanzlate's own source tree, not the host
+       * app's, so it can never find the component. Warn loudly and render the children,
+       * which keeps the sentence readable instead of silently dropping it.
+       */
+      warnOnce(
+        `[tanzlate] <${original}> is not registered, so it cannot be rendered. ` +
+          `Call registerComponent('${fileName}', ${fileName}) once at app startup. ` +
+          `The ':components' prop only supplies props -- it does not resolve components.`,
       );
+
+      return h(Fragment, elementContent);
     }
 
     // function renderParsedTranslation(parsed: ParsedResult): Array<VNode | string> | string {
