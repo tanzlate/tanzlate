@@ -1,0 +1,24 @@
+name: Install dependencies
+description: Set up pnpm and Node, then install the workspace.
+
+inputs:
+  node_version:
+    description: Node version to use
+    required: false
+    default: '22'
+
+runs:
+  using: composite
+  steps:
+    # pnpm must exist before setup-node can use it as a cache backend.
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 10
+
+    - uses: actions/setup-node@v7
+      with:
+        node-version: ${{ inputs.node_version }}
+        cache: pnpm
+
+    - run: pnpm install --no-frozen-lockfile
+      shell: bash
