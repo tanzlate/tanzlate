@@ -41,17 +41,34 @@ function renderWith(tZ: () => string, components: Record<string, unknown> = {}) 
 const render = (str: string, components: Record<string, unknown> = {}) =>
   renderWith(() => str, components)();
 
-describe('attributes written in the translation string', () => {
-  it('renders href and target on a plain HTML tag', () => {
-    expect(render('a <a target="_blank" href="https://reteach.io">link</a>')).toContain(
-      '<a target="_blank" href="https://reteach.io">link</a>',
-    );
+describe('components map: attrs, on, props', () => {
+  it('applies attrs to the rendered element', () => {
+    expect(
+      render('a <a>link</a>', { a: { attrs: { href: '/help', target: '_blank' } } }),
+    ).toContain('<a href="/help" target="_blank">link</a>');
   });
 
-  it('lets :components override an inline attribute', () => {
+  it('turns on.click into an onClick listener', () => {
+    let clicked = 0;
+    const html = render('<a>go</a>', { a: { on: { click: () => (clicked += 1) } } });
+    document.querySelector('a')?.dispatchEvent(new Event('click'));
+
+    expect(html).toContain('go');
+    expect(clicked).toBe(1);
+  });
+
+  it('passes everything else through as props', () => {
     expect(
-      render('<a href="https://from-string.example">x</a>', { a: { href: '/from-prop' } }),
-    ).toContain('href="/from-prop"');
+      render('<ColoredLabel />', { ColoredLabel: { color: '#0f0', label: 'Green' } }),
+    ).toContain('Green');
+  });
+
+  it('drops an unsafe URL in attrs and warns', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const html = render('<a>x</a>', { a: { attrs: { href: 'javascript:alert(1)' } } });
+
+    expect(html).not.toContain('javascript:');
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('unsafe'));
   });
 });
 

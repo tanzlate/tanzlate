@@ -2,7 +2,6 @@ export {
   areComponentsPresent,
   hasManyChildren,
   isLowercaseHtmlTag,
-  parseAttributes,
   parseTranslation,
   removeNumberSuffix,
 };
@@ -16,28 +15,19 @@ export type { FlatComponent, ParsedResult, TagObject };
  */
 const TAG_NAME = '[A-Za-z][\\w-]*';
 
-/** Matches an opening, closing, or self-closing tag. Used only to *detect* that tags exist. */
+// Only used to detect whether a string contains any tag at all.
 const ANY_TAG = new RegExp(`</?${TAG_NAME}\\s*[^>]*/?>`, 'g');
 
 /**
- * Matches a single tag, consuming quoted attribute values as a unit so that a `>` inside
- * an attribute (`title="a > b"`) does not terminate the tag early.
- *
- * Groups: 1 = leading slash (closing tag), 2 = tag name, 3 = attributes, 4 = trailing slash.
+ * Matches a single tag. Quoted runs are consumed whole so a stray `>` inside one can't
+ * end the tag early. Groups: 1 closing slash, 2 name, 3 ignored, 4 self-closing slash.
  */
 const TOKEN = new RegExp(`<(/)?(${TAG_NAME})((?:"[^"]*"|'[^']*'|[^>])*?)(/)?>`, 'g');
 
-/**
- * A parsed tag.
- *
- * `attributes` holds any attributes written inline in the translation string, e.g.
- * `<a href="/help">`. In Vue 3 these go into the same object as props, so the renderer
- * merges them with the `components` map -- which wins on conflict.
- */
+/** A parsed tag. Props are never carried here -- they come from the `components` map. */
 interface TagObject {
   tag: string;
   content?: TagObject[] | string;
-  attributes?: Record<string, string>;
 }
 
 interface FlatComponent {
@@ -50,12 +40,11 @@ type ParsedResult = (string | TagObject)[];
 interface Token {
   kind: 'open' | 'close' | 'self';
   tag: string;
-  attributes: string;
   start: number;
   end: number;
 }
 
-/** True when a parsed tag holds child tokens rather than a plain string. */
+// True when the tag holds child tokens rather than a plain string.
 function hasManyChildren(element: TagObject): boolean {
   if (!element.content) {
     return false;
@@ -71,41 +60,21 @@ function removeNumberSuffix(str: string): string {
   return str.replace(/-\d+$/, '');
 }
 
-/** Returns every tag found in the string, or null when there are none. */
+/*
+ * Array of the tags found, or null.
+ * Example: ["<NuxtLink>", "</NuxtLink>"]
+ */
 function areComponentsPresent(translationString: string): string[] | null {
   ANY_TAG.lastIndex = 0;
   return translationString.match(ANY_TAG);
 }
 
-/**
- * Splits a raw attribute list into a record.
- *
- * Handles `name="value"`, `name='value'` and valueless `name` (which becomes `''`, matching
- * how HTML boolean attributes behave). Anything unparseable is skipped rather than throwing.
- */
-function parseAttributes(raw: string): Record<string, string> | undefined {
-  if (!raw) {
-    return undefined;
-  }
-
-  const attrs: Record<string, string> = {};
-  const ATTR = /([:@]?[A-Za-z_][\w:.-]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+)))?/g;
-
-  let match: RegExpExecArray | null;
-  while ((match = ATTR.exec(raw)) !== null) {
-    const [, name, dq, sq, bare] = match;
-    attrs[name] = dq ?? sq ?? bare ?? '';
-  }
-
-  return Object.keys(attrs).length > 0 ? attrs : undefined;
-}
-
-/** A lowercase first letter means a native HTML element rather than a component. */
+// Lowercase first letter means a native HTML element, not a component.
 function isLowercaseHtmlTag(name: string): boolean {
   return /^[a-z]/.test(name);
 }
 
-/** Reads the next tag at or after `from`, or null when none remains. */
+// Next tag at or after `from`, or null.
 function nextToken(input: string, from: number): Token | null {
   TOKEN.lastIndex = from;
   const m = TOKEN.exec(input);
@@ -113,22 +82,19 @@ function nextToken(input: string, from: number): Token | null {
     return null;
   }
 
-  const [raw, closing, tag, rawAttrs, selfClosing] = m;
+  const [raw, closing, tag, , selfClosing] = m;
 
   return {
     kind: closing ? 'close' : selfClosing ? 'self' : 'open',
     tag,
-    attributes: (rawAttrs ?? '').trim(),
     start: m.index,
     end: m.index + raw.length,
   };
 }
 
-/**
- * Finds the `</tag>` that closes the tag opened at `from`, counting nested occurrences of
- * the same name so that `<b>a <b>c</b> d</b>` closes on the outer `</b>`, not the inner one.
- *
- * Returns null when the tag is never closed.
+/*
+ * Counts depth so `<b>a <b>c</b> d</b>` closes on the outer `</b>`, not the inner one.
+ * Null when the tag is never closed.
  */
 function findClosing(
   input: string,
@@ -171,8 +137,8 @@ function findClosing(
  * //   '.',
  * // ]
  *
- * Unclosed and stray closing tags are emitted as literal text rather than throwing, so a
- * malformed translation degrades to plain text instead of rendering nothing.
+ * Unclosed and stray closing tags come back as literal text, so a malformed translation
+ * degrades to plain text instead of rendering nothing.
  */
 function parseTranslation(translationString: string): ParsedResult {
   const result: ParsedResult = [];
@@ -184,7 +150,7 @@ function parseTranslation(translationString: string): ParsedResult {
       break;
     }
 
-    // A stray `</tag>` with no opener: keep it as text and move past it.
+    // Stray `</tag>` with no opener: keep as text.
     if (token.kind === 'close') {
       if (token.start > cursor) {
         result.push(translationString.slice(cursor, token.start));
@@ -199,15 +165,14 @@ function parseTranslation(translationString: string): ParsedResult {
     }
 
     if (token.kind === 'self') {
-      const attributes = parseAttributes(token.attributes);
-      result.push(attributes ? { tag: token.tag, attributes } : { tag: token.tag });
+      result.push({ tag: token.tag });
       cursor = token.end;
       continue;
     }
 
     const closed = findClosing(translationString, token.tag, token.end);
 
-    // Opened but never closed: emit the raw tag as text so the sentence survives.
+    // Opened, never closed: keep the raw tag as text so the sentence survives.
     if (!closed) {
       result.push(translationString.slice(token.start, token.end));
       cursor = token.end;
@@ -215,13 +180,9 @@ function parseTranslation(translationString: string): ParsedResult {
     }
 
     const node: TagObject = { tag: token.tag };
-    const attributes = parseAttributes(token.attributes);
-    if (attributes) {
-      node.attributes = attributes;
-    }
     node.content = areComponentsPresent(closed.inner)
       ? (parseTranslation(closed.inner) as TagObject[])
-      : closed.inner;
+      : closed.inner.trim();
 
     result.push(node);
     cursor = closed.end;
