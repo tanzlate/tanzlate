@@ -26,10 +26,27 @@ type ComponentsProps = VNodeProps &
     [name: string]: (VNodeProps & HTMLAttributes & { [key: string]: unknown }) | null;
   };
 
-/** Attribute names that must never come from a translation string. */
-const EVENT_HANDLER = /^on[A-Z-]/i;
-const URL_ATTRIBUTE = new Set(['href', 'src', 'action', 'formaction', 'xlink:href']);
-const UNSAFE_URL = /^\s*(?:javascript:|data:text\/html)/i;
+/*
+ * Attributes coming out of a translation string are filtered before they reach h().
+ *
+ * Two rules, both deliberately conservative:
+ *
+ * - Any name starting with "on" is refused. Vue binds `onClick` as a listener, and a plain
+ *   `onclick` string falls through as a DOM attribute and executes, so both forms matter.
+ *   This also refuses a prop that merely starts with "on" (e.g. `only`); pass those via
+ *   `:components`, which is not filtered.
+ *
+ * - URL-bearing attributes are checked with the platform URL parser rather than a pattern.
+ *   A denylist cannot win here: browsers strip control characters inside a scheme, so
+ *   `java\tscript:` is a live javascript: URL that no naive regex matches. Parsing and
+ *   allowlisting the resulting protocol closes that whole class.
+ */
+const EVENT_HANDLER = /^on/i;
+const URL_ATTRIBUTE = new Set(['href', 'src', 'action', 'formaction', 'xlink:href', 'poster']);
+const SAFE_URL_SCHEMES = new Set(['http:', 'https:', 'mailto:', 'tel:', 'ftp:']);
+
+/** Base used only to resolve relative URLs; never rendered. */
+const RELATIVE_URL_BASE = 'https://tanzlate.invalid';
 
 const warned = new Set<string>();
 
@@ -44,11 +61,25 @@ function warnOnce(message: string): void {
 }
 
 /**
+ * True when a URL resolves to a scheme that is safe to render.
+ *
+ * Relative URLs resolve against {@link RELATIVE_URL_BASE} and so inherit `https:`.
+ * Anything the parser rejects outright is treated as unsafe.
+ */
+function isSafeUrl(value: string): boolean {
+  try {
+    return SAFE_URL_SCHEMES.has(new URL(value, RELATIVE_URL_BASE).protocol);
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Filters attributes parsed out of a translation string.
  *
  * Translation values are interpolated *before* the string is parsed, so an attribute can
- * carry user-supplied data. Event handlers and `javascript:` URLs are dropped rather than
- * forwarded to `h()`.
+ * carry user-supplied data. Anything refused here is dropped with a warning; the rest is
+ * merged into the props object, where `:components` still takes precedence.
  */
 function sanitizeAttributes(
   attributes: Record<string, string> | undefined,
@@ -63,14 +94,17 @@ function sanitizeAttributes(
   for (const [name, value] of Object.entries(attributes)) {
     if (EVENT_HANDLER.test(name)) {
       warnOnce(
-        `[tanzlate] ignoring event handler "${name}" on <${tag}> -- ` +
-          `event handlers cannot come from a translation string. Pass it via ':components'.`,
+        `[tanzlate] ignoring "${name}" on <${tag}> -- attributes starting with "on" cannot ` +
+          `come from a translation string. Pass it via the ':components' prop instead.`,
       );
       continue;
     }
 
-    if (URL_ATTRIBUTE.has(name.toLowerCase()) && UNSAFE_URL.test(value)) {
-      warnOnce(`[tanzlate] ignoring unsafe "${name}" URL on <${tag}>.`);
+    if (URL_ATTRIBUTE.has(name.toLowerCase()) && !isSafeUrl(value)) {
+      warnOnce(
+        `[tanzlate] ignoring "${name}" on <${tag}> -- only ` +
+          `${[...SAFE_URL_SCHEMES].join(', ')} and relative URLs are allowed.`,
+      );
       continue;
     }
 

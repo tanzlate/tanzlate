@@ -54,21 +54,46 @@ describe('attributes written in the translation string', () => {
     ).toContain('href="/from-prop"');
   });
 
+  it.each([
+    ['javascript:alert(1)', 'plain javascript:'],
+    ['  javascript:alert(1)', 'leading whitespace'],
+    ['JaVaScRiPt:alert(1)', 'mixed case'],
+    ['java\tscript:alert(1)', 'tab inside the scheme'],
+    ['java\nscript:alert(1)', 'newline inside the scheme'],
+    ['vbscript:msgbox(1)', 'vbscript:'],
+    ['data:text/html,<script>alert(1)</script>', 'data: html'],
+    ['data:image/svg+xml;base64,PHN2Zy8+', 'data: svg'],
+  ])('refuses %j (%s)', (url) => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // warnOnce dedupes by message for the process lifetime, so the warning itself is
+    // asserted separately below; here we only care that the attribute never reaches the DOM.
+    expect(render(`<a href="${url}">x</a>`)).not.toContain('href=');
+  });
+
+  it('warns when it refuses a URL', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render('<img src="javascript:alert(1)" />');
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('only http:'));
+  });
+
+  it.each([
+    ['https://reteach.io', 'absolute https'],
+    ['http://reteach.io', 'absolute http'],
+    ['/relative/path', 'root-relative'],
+    ['mailto:hi@example.com', 'mailto'],
+    ['tel:+4930123456', 'tel'],
+  ])('allows %j (%s)', (url) => {
+    expect(render(`<a href="${url}">x</a>`)).toContain(`href="${url}"`);
+  });
+
   it('drops event handlers and warns', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const html = render('<a onclick="alert(1)" href="/ok">x</a>');
 
     expect(html).not.toContain('onclick');
     expect(html).toContain('href="/ok"');
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('event handler'));
-  });
-
-  it('drops javascript: URLs and warns', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const html = render('<a href="javascript:alert(1)">x</a>');
-
-    expect(html).not.toContain('javascript:');
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('unsafe'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('cannot'));
   });
 });
 
