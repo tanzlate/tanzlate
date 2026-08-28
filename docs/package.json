@@ -11,9 +11,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "mermaid": "^11.12.0",
+    "mermaid": "11.12.0",
     "vitepress": "1.6.4",
-    "vitepress-plugin-mermaid": "^2.0.17"
+    "vitepress-plugin-mermaid": "2.0.17"
   },
   "keywords": [],
   "license": "ISC",
