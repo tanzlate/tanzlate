@@ -4,100 +4,28 @@ export {
   isLowercaseHtmlTag,
   parseTranslation,
   removeNumberSuffix,
-  type FlatComponent,
 };
+export type { FlatComponent, ParsedResult, TagObject };
 
 /**
- * TAG_NAME is used to build the regexes
- * - It matches tag names like:
- *   - PascalCase: <NuxtLink>
- *   - kebab-case: <my-component> or HTML tags like <strong>
- *   - Component with numeric suffixes: <NuxtLink-1>, <my-component-2>
+ * Tag names accepted inside a translation string:
+ * - PascalCase components: `<NuxtLink>`
+ * - kebab-case components and HTML tags: `<my-component>`, `<strong>`
+ * - a numeric suffix, to use the same component twice in one string: `<NuxtLink-2>`
  */
-const TAG_NAME = '([A-Za-z][\\w-]*)'; // allows PascalCase, kebab-case, and suffixes like -1
+const TAG_NAME = '[A-Za-z][\\w-]*';
 
-const i18nRegex = {
-  /*
-   * We need to consider different cases:
-   * 1 Opening tags (e.g. <NuxtLink>)
-   * 2 Closing tags (e.g. </NuxtLink>)
-   * 3 Self-closing tags (e.g. <NuxtLink />, which in this case could refer to a class as the logo in the login page)
-   * 4 Tag with optional numeric suffix (e.g. <NuxtLink-1> or <NuxtLink-2>) if this component is used multiple times in the same translation string
-   *
-   * We will then inject the props directly in the template that call the  ̶R̶t̶T̶r̶a̶n̶s̶l̶a̶t̶e̶ Translate component
-   * in the case 3 it's more straightforward but in the case 1 and 2 we need to also keep the content inside the tag
-   *
-   * These are 3 RegEx that we can use to detect components or tags in the translation value
-   * All of them also support snake-case in case of third-party components
-   *
-   */
-
-  TAG_NAME: '([A-Za-z][\\w-]*)', // allows PascalCase, kebab-case, and suffixes like -1
-
-  // selfClosingAndOpeningTagsOnly: new RegExp(`<${TAG_NAME}\\s*/>`, 'g'),
-
-  /**
-   * Matches self-closing tags
-   * E.g. <Tag ... />
-   * Or in the case of multiple same tags with suffixes: <Tag-1 ... />
-   *
-   * Groups:
-   *  1: tag name
-   *  2: attributes (unused)
-   */
-  selfClosingTags: new RegExp(`<${TAG_NAME}\\s*([^>]*)\\s*/>`, 'g'),
-
-  // selfClosingOpeningAndClosingTags: new RegExp(
-  //   `<${TAG_NAME}\\s*([^>]*)\\s*(?:/)?>(?:</${TAG_NAME}\\s*>)?|</${TAG_NAME}\\s*>`,
-  //   'g',
-  // ),
-
-  /**
-   * Matches all types of tags: opening, closing, and self-closing
-   * E.g. <Tag ...>, </Tag>, <Tag ... />
-   * Or in the case of multiple same tags with suffixes: <Tag-1 ...>, </Tag-1>, <Tag-1 ... />
-   *
-   * Used for recursive parsing when we need to find all tags in a string
-   *
-   * Groups:
-   *  1: opening/self-closing tag name
-   *  2: attributes (unused)
-   *  3: self-closing slash (if any)
-   *  4: closing tag name
-   */
-  allTypesOfTags: new RegExp(`<${TAG_NAME}\\s*([^>]*)\\s*(/?)>|</${TAG_NAME}\\s*>`, 'g'),
-
-  // Paired OR self-closing, with content captured when paired.
-  // Groups:
-  //  1: paired tag name, 2: attributes (unused), 3: inner content
-  //  4: self-closing tag name
-  allTagsWithContent: new RegExp(
-    `<${TAG_NAME}\\s*([^>]*)\\s*(?:/)?>([\\s\\S]*?)</\\1\\s*>|<${TAG_NAME}\\s*/>`,
-    'g',
-  ),
-
-  /**
-   * Matches opening and closing tags, and captures inner content.
-   * E.g. <Tag ...>inner</Tag>
-   * Or in the case of multiple same tags with suffixes: <Tag-1 ...>inner</Tag-1>
-   *
-   * Groups:
-   *  1: tag name
-   *  2: attributes (unused)
-   *  3: inner content
-   */
-  openingAndClosingTagsWithContent: new RegExp(
-    `<${TAG_NAME}\\s*([^>]*)\\s*(?:/)?>([\\s\\S]*?)</\\1\\s*>`,
-    'g',
-  ),
-
-  standaloneTags: new RegExp(`<${TAG_NAME}\\s*([^>]*)\\s*(?:/)?>(?:</\\1\\s*>)?`, 'g'),
-};
+// Only used to detect whether a string contains any tag at all.
+const ANY_TAG = new RegExp(`</?${TAG_NAME}\\s*[^>]*/?>`, 'g');
 
 /**
- * Types
+ * Matches a single tag. Quoted runs are consumed whole so a stray `>` inside one can't
+ * end the tag early. Groups: 1 closing slash, 2 name, 3 ignored, 4 self-closing slash.
  */
-export interface TagObject {
+const TOKEN = new RegExp(`<(/)?(${TAG_NAME})((?:"[^"]*"|'[^']*'|[^>])*?)(/)?>`, 'g');
+
+/** A parsed tag. Props are never carried here -- they come from the `components` map. */
+interface TagObject {
   tag: string;
   content?: TagObject[] | string;
 }
@@ -107,14 +35,16 @@ interface FlatComponent {
   content: string;
 }
 
-export type ParsedResult = (string | TagObject)[]; // | ParsedResult[]
+type ParsedResult = (string | TagObject)[];
 
-/**
- * Utility to check if a parsed tag object has multiple children
- *
- * @param {TagObject} element
- * @returns {boolean}
- */
+interface Token {
+  kind: 'open' | 'close' | 'self';
+  tag: string;
+  start: number;
+  end: number;
+}
+
+// True when the tag holds child tokens rather than a plain string.
 function hasManyChildren(element: TagObject): boolean {
   if (!element.content) {
     return false;
@@ -122,131 +52,142 @@ function hasManyChildren(element: TagObject): boolean {
   return Array.isArray(element.content);
 }
 
-/*
- * Used to handle cases when a translation string contains multiple tags with the same name
- * e.g. "<NuxtLink>Wilkommen</NuxtLink> <NuxtLink-2>zurück</NuxtLink-2>""
- * We remove the hyphen and the number to only render the real tag name
+/**
+ * Strips the disambiguating suffix used when the same component appears more than once
+ * in a single translation string: `NuxtLink-2` -> `NuxtLink`.
  */
-function removeNumberSuffix(str: string) {
-  return str.replace(/-\d+$/, ''); // only at the end
+function removeNumberSuffix(str: string): string {
+  return str.replace(/-\d+$/, '');
 }
 
 /*
- * Will return an array of strings of tags or null
- * Example: ["<NuxtLink>","</NuxtLink>"]
+ * Array of the tags found, or null.
+ * Example: ["<NuxtLink>", "</NuxtLink>"]
  */
 function areComponentsPresent(translationString: string): string[] | null {
-  return translationString.match(i18nRegex.allTypesOfTags);
+  ANY_TAG.lastIndex = 0;
+  return translationString.match(ANY_TAG);
 }
 
-function isLowercaseHtmlTag(name: string) {
+// Lowercase first letter means a native HTML element, not a component.
+function isLowercaseHtmlTag(name: string): boolean {
   return /^[a-z]/.test(name);
 }
 
-// function isSelfClosingTag(str: string): boolean {
-//   const selfClosingTags = str.match(i18nRegex.selfClosingTags);
-//   return selfClosingTags ? selfClosingTags.includes(str) : false;
-// }
-
-/*
- * Parse a given translation string and return an array of strings and objects
- * e.g. for a key
- * "Wunderbar! <NuxtLink>The customer <strong>{{ customer.name }}</strong></NuxtLink> hat den <NuxtLink-2>Kurs</NuxtLink-2> erfolgreich absolviert.",
- *
- * Will return
- * [
- *   'Wunderbar! ',
- *   {
- *     tag: 'NuxtLink',
- *     content: [
- *       'The customer ',
- *       {
- *         tag: 'strong',
- *         content: 'Arthur',
- *       },
- *     ],
- *   },
- *   ' hat den ',
- *   {
- *     tag: 'NuxtLink-2',
- *     content: 'Kurs',
- *   },
- *   ' erfolgreich absolviert.',
- * ]
- */
-
-function parseTranslation(translationString: string): ParsedResult {
-  const result: ParsedResult = [];
-
-  // Explicit, readable patterns (support kebab-case and -1 suffixes)
-  const PAIRED_RE = i18nRegex.openingAndClosingTagsWithContent;
-  const SELF_RE = i18nRegex.selfClosingTags;
-
-  let cursor = 0;
-
-  // Find the next earliest tag (paired or self-closing) from a given position
-  function findNext(from: number) {
-    PAIRED_RE.lastIndex = from;
-    SELF_RE.lastIndex = from;
-
-    const paired = PAIRED_RE.exec(translationString);
-
-    const self = SELF_RE.exec(translationString);
-
-    // choose whichever starts earlier; if equal, prefer paired (so <X>…</X> wins over <X/> at same spot)
-    const pick =
-      paired && self
-        ? paired.index <= self.index
-          ? { kind: 'paired', m: paired }
-          : { kind: 'self', m: self }
-        : paired
-          ? { kind: 'paired', m: paired }
-          : self
-            ? { kind: 'self', m: self }
-            : null;
-
-    if (!pick) return null;
-
-    const start = pick.m.index;
-    const end = (pick.kind === 'paired' ? PAIRED_RE : SELF_RE).lastIndex;
-
-    if (pick.kind === 'paired') {
-      const tagName = pick.m[1]; // name for paired
-      const inner = pick.m[3] ?? ''; // inner content
-      return { kind: 'paired' as const, tagName, inner, start, end };
-    } else {
-      const tagName = pick.m[1]; // name for self-closing
-      return { kind: 'self' as const, tagName, start, end };
-    }
+// Next tag at or after `from`, or null.
+function nextToken(input: string, from: number): Token | null {
+  TOKEN.lastIndex = from;
+  const m = TOKEN.exec(input);
+  if (!m) {
+    return null;
   }
 
-  while (cursor < translationString.length) {
-    const next = findNext(cursor);
-    if (!next) break;
+  const [raw, closing, tag, , selfClosing] = m;
 
-    // push plain text before this tag
-    if (next.start > cursor) {
-      result.push(translationString.slice(cursor, next.start));
+  return {
+    kind: closing ? 'close' : selfClosing ? 'self' : 'open',
+    tag,
+    start: m.index,
+    end: m.index + raw.length,
+  };
+}
+
+/*
+ * Counts depth so `<b>a <b>c</b> d</b>` closes on the outer `</b>`, not the inner one.
+ * Null when the tag is never closed.
+ */
+function findClosing(
+  input: string,
+  tag: string,
+  from: number,
+): { inner: string; end: number } | null {
+  let depth = 1;
+  let cursor = from;
+
+  for (;;) {
+    const token = nextToken(input, cursor);
+    if (!token) {
+      return null;
     }
 
-    if (next.kind === 'self') {
-      result.push({ tag: next.tagName });
-    } else {
-      // paired tag
-      if (next.inner && areComponentsPresent(next.inner)) {
-        result.push({
-          tag: next.tagName,
-          content: parseTranslation(next.inner) as string | TagObject[],
-        });
-      } else {
-        result.push({ tag: next.tagName, content: (next.inner ?? '').trim() });
+    if (token.tag === tag) {
+      if (token.kind === 'open') {
+        depth += 1;
+      } else if (token.kind === 'close') {
+        depth -= 1;
+        if (depth === 0) {
+          return { inner: input.slice(from, token.start), end: token.end };
+        }
       }
     }
 
-    cursor = next.end;
+    cursor = token.end;
+  }
+}
+
+/**
+ * Parses a translation string into an array of plain strings and tag objects.
+ *
+ * @example
+ * parseTranslation('<NuxtLink><b>Ada</b></NuxtLink> finished <NuxtLink-2>the course</NuxtLink-2>.')
+ * // [
+ * //   { tag: 'NuxtLink', content: [{ tag: 'b', content: 'Ada' }] },
+ * //   ' finished ',
+ * //   { tag: 'NuxtLink-2', content: 'the course' },
+ * //   '.',
+ * // ]
+ *
+ * Unclosed and stray closing tags come back as literal text, so a malformed translation
+ * degrades to plain text instead of rendering nothing.
+ */
+function parseTranslation(translationString: string): ParsedResult {
+  const result: ParsedResult = [];
+  let cursor = 0;
+
+  while (cursor < translationString.length) {
+    const token = nextToken(translationString, cursor);
+    if (!token) {
+      break;
+    }
+
+    // Stray `</tag>` with no opener: keep as text.
+    if (token.kind === 'close') {
+      if (token.start > cursor) {
+        result.push(translationString.slice(cursor, token.start));
+      }
+      result.push(translationString.slice(token.start, token.end));
+      cursor = token.end;
+      continue;
+    }
+
+    if (token.start > cursor) {
+      result.push(translationString.slice(cursor, token.start));
+    }
+
+    if (token.kind === 'self') {
+      result.push({ tag: token.tag });
+      cursor = token.end;
+      continue;
+    }
+
+    const closed = findClosing(translationString, token.tag, token.end);
+
+    // Opened, never closed: keep the raw tag as text so the sentence survives.
+    if (!closed) {
+      result.push(translationString.slice(token.start, token.end));
+      cursor = token.end;
+      continue;
+    }
+
+    const node: TagObject = { tag: token.tag };
+    node.content = areComponentsPresent(closed.inner)
+      ? (parseTranslation(closed.inner) as TagObject[])
+      : closed.inner.trim();
+
+    result.push(node);
+    cursor = closed.end;
   }
 
-  // trailing text
   if (cursor < translationString.length) {
     result.push(translationString.slice(cursor));
   }

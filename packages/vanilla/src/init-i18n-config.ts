@@ -8,7 +8,7 @@ export { initI18nConfig };
 
 const i18NConfigOptions: InitOptions = {
   fallbackLng: 'en',
-  preload: ['en', 'en'],
+  preload: ['en'],
   interpolation: {
     escapeValue: false,
   },
@@ -30,6 +30,7 @@ async function initI18nConfig({
   resources,
   initAsync = false,
   backend,
+  interpolation,
 }: Createi18nConfigParams): Promise<I18nApp> {
   const initializedI18n = createI18nAppInstance();
 
@@ -42,6 +43,8 @@ async function initI18nConfig({
     supportedLngs: supportedLanguages,
     resources,
     initAsync,
+    // Caller wins, so escapeValue can be turned back on.
+    interpolation: { ...i18NConfigOptions.interpolation, ...interpolation },
   };
 
   // const opts = configureOptions(i18NConfig);
