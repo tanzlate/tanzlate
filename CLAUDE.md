@@ -61,9 +61,9 @@ _vanilla_ package's tests.
   commit to `dev` directly.
 - A workflow auto-opens a `dev` → `main` PR on every push to `dev`. Merging to `main` triggers
   the release.
-- Commit messages are free-form. `commitlint.config.mjs` is `extends: []` and
-  `.husky/commit-msg` runs `npx --no --edit $1` with no linter named, so neither enforces
-  anything. Do not assume conventional-commit prefixes are required.
+- Commit messages are free-form. commitlint was deliberately removed — there is no
+  `commit-msg` hook and no commit convention to enforce. Do not assume conventional-commit
+  prefixes are required, and do not reintroduce commitlint without being asked.
 - `.husky/pre-commit` runs `lint-staged`: `eslint --fix` on JS/TS and `prettier --write` on
   everything else.
 

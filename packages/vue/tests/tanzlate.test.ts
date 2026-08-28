@@ -72,6 +72,58 @@ describe('components map: attrs, on, props', () => {
   });
 });
 
+describe('globally registered components need no registerComponent', () => {
+  const NuxtLink = defineComponent({
+    props: { to: { type: String, default: '' } },
+    setup:
+      (p, { slots }) =>
+      () =>
+        h('a', { href: p.to }, slots.default?.()),
+  });
+
+  function renderWithGlobal(str: string, components: Record<string, unknown> = {}) {
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    const app = createApp(
+      defineComponent({
+        setup: () => () => h(Tanzlate, { tZ: () => str, i18nKey: 'k', components } as never),
+      }),
+    );
+    app.component('NuxtLink', NuxtLink);
+    app.config.warnHandler = () => {};
+    app.mount(el);
+    mounted.push(app);
+    return el.innerHTML.replace(/\n\s*/g, ' ');
+  }
+
+  it('resolves an app-level component', () => {
+    expect(renderWithGlobal('Go <NuxtLink>home</NuxtLink>.')).toContain('<a href="">home</a>');
+  });
+
+  it('still takes props from the components map', () => {
+    expect(
+      renderWithGlobal('Go <NuxtLink>home</NuxtLink>.', { NuxtLink: { to: '/home' } }),
+    ).toContain('<a href="/home">home</a>');
+  });
+
+  it('handles the -N suffix on a globally registered component', () => {
+    const html = renderWithGlobal('<NuxtLink>a</NuxtLink> and <NuxtLink-2>b</NuxtLink-2>', {
+      NuxtLink: { to: '/one' },
+      'NuxtLink-2': { to: '/two' },
+    });
+
+    expect(html).toContain('<a href="/one">a</a>');
+    expect(html).toContain('<a href="/two">b</a>');
+  });
+
+  it('does not warn when the app provides the component', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    renderWithGlobal('Go <NuxtLink>home</NuxtLink>.');
+
+    expect(warn).not.toHaveBeenCalled();
+  });
+});
+
 describe('unregistered component', () => {
   it('warns and still renders its children instead of an empty placeholder', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
