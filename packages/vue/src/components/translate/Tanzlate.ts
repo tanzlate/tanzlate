@@ -7,7 +7,7 @@ import {
   TagObject,
 } from '@/utils/parse-translation';
 import { TFunc } from '@tanzlate/core';
-import { TOptions } from 'i18next';
+import type { TOptions } from 'i18next';
 import { isString } from 'unreadable-typescript';
 import {
   computed,

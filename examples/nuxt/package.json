@@ -14,8 +14,8 @@
     "@tanzlate/core": "workspace:*",
     "@tanzlate/vanilla": "workspace:*",
     "@tanzlate/vue": "workspace:^",
-    "nuxt": "^4.4.2",
-    "vue": "^3.5.32",
-    "vue-router": "^5.0.4"
+    "nuxt": "4.4.2",
+    "vue": "3.5.33",
+    "vue-router": "5.0.4"
   }
 }

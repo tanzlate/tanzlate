@@ -1,7 +1,7 @@
 import { I18nContext, i18nKey } from '@/types/i18n-key';
 import { InputNamespaces, TFunc } from '@tanzlate/core';
 import { contextCoreStub, CoreContext } from '@tanzlate/vanilla';
-import { TOptions } from 'i18next';
+import type { TOptions } from 'i18next';
 import { inject, onUnmounted, provide, ref } from 'vue';
 
 export function setupI18nContext() {
