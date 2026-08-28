@@ -1,5 +1,11 @@
 # @tanzlate/core
 
+## 0.3.0
+
+### Minor Changes
+
+- 349e0b0: Update tanzlate
+
 ## 0.2.0
 
 ### Minor Changes
