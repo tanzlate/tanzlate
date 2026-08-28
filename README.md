@@ -52,6 +52,13 @@ With tanzlate the whole sentence stays in one string, written the way you'd writ
 }
 ```
 
+```ts
+// once, at app startup
+import { registerComponent } from '@tanzlate/vue';
+registerComponent('UserBadge', UserBadge);
+registerComponent('AppButton', AppButton);
+```
+
 ```vue
 <Tanzlate
   :t-z="tanz"
@@ -63,7 +70,7 @@ With tanzlate the whole sentence stays in one string, written the way you'd writ
 />
 ```
 
-Translators read a natural sentence — including the button label. Developers map tag names to the components they already use.
+Translators read a natural sentence — including the button label. Developers register their components once, then map per-usage props to the tag names.
 
 ---
 
@@ -167,9 +174,18 @@ The tag syntax is intentionally close to Vue template syntax. Self-closing (`<Us
 
 ### Passing props per use
 
+> **PascalCase components must be registered first** (see [Component registry](#component-registry--register-once-use-everywhere)).
+> `:components` supplies _props for_ a tag — it does not resolve the component itself.
+> Lowercase HTML tags (`<a>`, `<strong>`, `<b>`) need no registration.
+
 ```vue
 <script setup lang="ts">
-import { Tanzlate, useI18n } from '@tanzlate/vue';
+import { Tanzlate, registerComponent, useI18n } from '@tanzlate/vue';
+import UserBadge from '@/components/UserBadge.vue';
+import AppButton from '@/components/AppButton.vue';
+
+registerComponent('UserBadge', UserBadge);
+registerComponent('AppButton', AppButton);
 
 const { tanz } = useI18n('onboarding');
 </script>
@@ -201,7 +217,12 @@ registerComponent('UserBadge', UserBadge);
 registerComponent('AppButton', AppButton);
 ```
 
-Registered components are resolved automatically — no `:components` prop needed unless you want to pass specific props for that usage. The `:components` prop takes priority over the registry when both are present.
+Registration is what makes a PascalCase tag resolvable. The `:components` prop is optional on top of that — use it to pass props for a particular usage:
+
+- **Registry** — resolves the tag to a component. Required for PascalCase tags.
+- **`:components`** — supplies props for that tag on this usage. Never resolves a component.
+
+Lowercase HTML tags are the exception: `<a>`, `<strong>` and friends render directly, so `:components="{ a: { href: '…' } }"` works with no registration.
 
 ---
 

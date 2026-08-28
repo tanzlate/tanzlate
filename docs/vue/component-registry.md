@@ -9,6 +9,8 @@ slug: /component-registry
 
 The registry lets you register Vue components or native HTML tags by name so they can be used inside your interpolated translations.
 
+Registration is **required** for PascalCase components: the `:components` prop passes props to a tag, but only the registry resolves the tag to an actual component. Lowercase HTML tags render without registration.
+
 For example, given this translation:
 
 ```json
@@ -19,14 +21,14 @@ For example, given this translation:
 }
 ```
 
-The `<Translate>` component will look up `<ColoredLabel-1>` and `<Icon />` in the registry.
+The `<Tanzlate>` component will look up `<ColoredLabel-1>` and `<Icon />` in the registry.
 
 ## Basic Usage
 
 1. Import the registry functions
 
 ```ts
-import { registerComponent } from 'path/to/component-registry';
+import { registerComponent } from '@tanzlate/vue';
 ```
 
 2. Register your components or HTML tags
@@ -50,4 +52,4 @@ registerComponent('Icon', { template: '<svg>...</svg>' }); // inline component
 }
 ```
 
-Your `<Translate>` component will render the `<em>` as HTML and `<ColoredLabel />` as the Vue component.
+Your `<Tanzlate>` component will render the `<em>` as HTML and `<ColoredLabel />` as the Vue component.
