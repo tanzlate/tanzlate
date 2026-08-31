@@ -1,7 +1,6 @@
 import { TFunc } from '@tanzlate/core';
 import type { TOptions } from 'i18next';
 import { isString } from 'unreadable-typescript';
-import type { Component } from 'vue';
 import {
   computed,
   defineComponent,
@@ -9,7 +8,6 @@ import {
   h,
   HTMLAttributes,
   PropType,
-  resolveDynamicComponent,
   VNode,
   VNodeProps,
 } from 'vue';
@@ -227,23 +225,11 @@ export default defineComponent({
         return h(htmlTag, componentProps, elementContent);
       }
 
-      /*
-       * Not in our registry and not an HTML tag -- try the app's own components. Nuxt
-       * auto-registers everything in components/, and app.component() does the same, so
-       * <NuxtLink> and friends need no explicit registerComponent call.
-       *
-       * resolveDynamicComponent hands back the name unchanged when nothing matches.
-       */
-      const globallyRegistered = resolveDynamicComponent(fileName);
-      if (typeof globallyRegistered !== 'string') {
-        return h(globallyRegistered as Component, componentProps, elementContent);
-      }
-
-      // Nothing anywhere. Warn and render the children so the sentence stays readable.
+      // Not registered and not an HTML tag. Warn and render the children so the
+      // sentence stays readable.
       warnOnce(
         `[tanzlate] <${original}> is not registered, so it cannot be rendered. ` +
-          `Register it with registerComponent('${fileName}', ${fileName}), or make it ` +
-          `globally available in your app. ` +
+          `Call registerComponent('${fileName}', ${fileName}) once at app startup. ` +
           `The ':components' prop only supplies props -- it does not resolve components.`,
       );
 
