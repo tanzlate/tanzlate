@@ -93,8 +93,9 @@ function nextToken(input: string, from: number): Token | null {
 }
 
 /*
- * Counts depth so `<b>a <b>c</b> d</b>` closes on the outer `</b>`, not the inner one.
- * Null when the tag is never closed.
+ * Finds the `</tag>` that closes the tag opened at `from`, counting nested occurrences of
+ * the same name so `<b>a <b>c</b> d</b>` closes on the outer `</b>`, not the inner one.
+ * Returns the inner content and the index past the closing tag, or null if never closed.
  */
 function findClosing(
   input: string,

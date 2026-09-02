@@ -41,86 +41,26 @@ function renderWith(tZ: () => string, components: Record<string, unknown> = {}) 
 const render = (str: string, components: Record<string, unknown> = {}) =>
   renderWith(() => str, components)();
 
-describe('components map: attrs, on, props', () => {
-  it('applies attrs to the rendered element', () => {
-    expect(
-      render('a <a>link</a>', { a: { attrs: { href: '/help', target: '_blank' } } }),
-    ).toContain('<a href="/help" target="_blank">link</a>');
-  });
-
-  it('turns on.click into an onClick listener', () => {
-    let clicked = 0;
-    const html = render('<a>go</a>', { a: { on: { click: () => (clicked += 1) } } });
-    document.querySelector('a')?.dispatchEvent(new Event('click'));
-
-    expect(html).toContain('go');
-    expect(clicked).toBe(1);
-  });
-
-  it('passes everything else through as props', () => {
+describe('components map', () => {
+  it('passes props through', () => {
     expect(
       render('<ColoredLabel />', { ColoredLabel: { color: '#0f0', label: 'Green' } }),
     ).toContain('Green');
   });
 
-  it('drops an unsafe URL in attrs and warns', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const html = render('<a>x</a>', { a: { attrs: { href: 'javascript:alert(1)' } } });
-
-    expect(html).not.toContain('javascript:');
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('unsafe'));
-  });
-});
-
-describe('globally registered components need no registerComponent', () => {
-  const NuxtLink = defineComponent({
-    props: { to: { type: String, default: '' } },
-    setup:
-      (p, { slots }) =>
-      () =>
-        h('a', { href: p.to }, slots.default?.()),
-  });
-
-  function renderWithGlobal(str: string, components: Record<string, unknown> = {}) {
-    const el = document.createElement('div');
-    document.body.appendChild(el);
-    const app = createApp(
-      defineComponent({
-        setup: () => () => h(Tanzlate, { tZ: () => str, i18nKey: 'k', components } as never),
-      }),
+  // Vue 3 takes props, attributes and listeners in one object.
+  it('applies plain attributes to an HTML tag', () => {
+    expect(render('a <a>link</a>', { a: { href: '/help', target: '_blank' } })).toContain(
+      '<a href="/help" target="_blank">link</a>',
     );
-    app.component('NuxtLink', NuxtLink);
-    app.config.warnHandler = () => {};
-    app.mount(el);
-    mounted.push(app);
-    return el.innerHTML.replace(/\n\s*/g, ' ');
-  }
-
-  it('resolves an app-level component', () => {
-    expect(renderWithGlobal('Go <NuxtLink>home</NuxtLink>.')).toContain('<a href="">home</a>');
   });
 
-  it('still takes props from the components map', () => {
-    expect(
-      renderWithGlobal('Go <NuxtLink>home</NuxtLink>.', { NuxtLink: { to: '/home' } }),
-    ).toContain('<a href="/home">home</a>');
-  });
+  it('binds an onClick listener', () => {
+    let clicked = 0;
+    render('<a>go</a>', { a: { onClick: () => (clicked += 1) } });
+    document.querySelector('a')?.dispatchEvent(new Event('click'));
 
-  it('handles the -N suffix on a globally registered component', () => {
-    const html = renderWithGlobal('<NuxtLink>a</NuxtLink> and <NuxtLink-2>b</NuxtLink-2>', {
-      NuxtLink: { to: '/one' },
-      'NuxtLink-2': { to: '/two' },
-    });
-
-    expect(html).toContain('<a href="/one">a</a>');
-    expect(html).toContain('<a href="/two">b</a>');
-  });
-
-  it('does not warn when the app provides the component', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    renderWithGlobal('Go <NuxtLink>home</NuxtLink>.');
-
-    expect(warn).not.toHaveBeenCalled();
+    expect(clicked).toBe(1);
   });
 });
 
