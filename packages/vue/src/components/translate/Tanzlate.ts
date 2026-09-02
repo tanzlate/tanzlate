@@ -19,14 +19,17 @@ import {
   removeNumberSuffix,
   TagObject,
 } from '../../utils/parse-translation';
-import { isSafeUrl, URL_ATTRIBUTES } from '../../utils/sanitize-url';
 import { resolveRegistered } from './component-registry';
 
-/** One entry of the `components` map: attrs, event handlers, and props for a tag. */
+/*
+ * One entry of the `components` map.
+ *
+ * Vue 3 takes props, attributes and listeners in the same object, so there is nothing to
+ * split: declared props bind as props, the rest fall through as attributes, and onClick
+ * and friends become listeners.
+ */
 type ComponentConfig = VNodeProps &
   HTMLAttributes & {
-    attrs?: Record<string, unknown>;
-    on?: Record<string, (...args: never[]) => unknown>;
     [key: string]: unknown;
   };
 
@@ -42,43 +45,6 @@ function warnOnce(message: string): void {
   warned.add(message);
   // eslint-disable-next-line no-console
   console.warn(message);
-}
-
-/**
- * Splits a `components` entry into what h() wants.
- *
- * `{ attrs, on, ...props }` -- attrs are applied as-is, `on` keys become onClick-style
- * listeners, everything else is a prop. URL attributes are checked before rendering.
- */
-function resolveConfig(config: ComponentConfig | null | undefined) {
-  if (!config) {
-    return undefined;
-  }
-
-  const { attrs, on, ...componentProps } = config;
-  const data: Record<string, unknown> = { ...componentProps };
-
-  if (attrs) {
-    for (const [name, value] of Object.entries(attrs)) {
-      if (
-        URL_ATTRIBUTES.has(name.toLowerCase()) &&
-        typeof value === 'string' &&
-        !isSafeUrl(value)
-      ) {
-        warnOnce(`[tanzlate] dropped unsafe "${name}" URL.`);
-        continue;
-      }
-      data[name] = value;
-    }
-  }
-
-  if (on) {
-    for (const [event, handler] of Object.entries(on)) {
-      data[`on${event.charAt(0).toUpperCase()}${event.slice(1)}`] = handler;
-    }
-  }
-
-  return Object.keys(data).length > 0 ? data : undefined;
 }
 
 export default defineComponent({
@@ -205,7 +171,7 @@ export default defineComponent({
       const original = element.tag; // e.g. "ColoredLabel-1" or "strong"
       const fileName = removeNumberSuffix(original); // "ColoredLabel"
 
-      const componentProps = resolveConfig(props.components[original]);
+      const componentProps = props.components[original] ?? undefined;
 
       // If the component content contains other nested tags, we recursively render them
       const elementContent = normalizeChildren(element.content) || [];

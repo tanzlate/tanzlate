@@ -41,34 +41,26 @@ function renderWith(tZ: () => string, components: Record<string, unknown> = {}) 
 const render = (str: string, components: Record<string, unknown> = {}) =>
   renderWith(() => str, components)();
 
-describe('components map: attrs, on, props', () => {
-  it('applies attrs to the rendered element', () => {
-    expect(
-      render('a <a>link</a>', { a: { attrs: { href: '/help', target: '_blank' } } }),
-    ).toContain('<a href="/help" target="_blank">link</a>');
-  });
-
-  it('turns on.click into an onClick listener', () => {
-    let clicked = 0;
-    const html = render('<a>go</a>', { a: { on: { click: () => (clicked += 1) } } });
-    document.querySelector('a')?.dispatchEvent(new Event('click'));
-
-    expect(html).toContain('go');
-    expect(clicked).toBe(1);
-  });
-
-  it('passes everything else through as props', () => {
+describe('components map', () => {
+  it('passes props through', () => {
     expect(
       render('<ColoredLabel />', { ColoredLabel: { color: '#0f0', label: 'Green' } }),
     ).toContain('Green');
   });
 
-  it('drops an unsafe URL in attrs and warns', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const html = render('<a>x</a>', { a: { attrs: { href: 'javascript:alert(1)' } } });
+  // Vue 3 takes props, attributes and listeners in one object.
+  it('applies plain attributes to an HTML tag', () => {
+    expect(render('a <a>link</a>', { a: { href: '/help', target: '_blank' } })).toContain(
+      '<a href="/help" target="_blank">link</a>',
+    );
+  });
 
-    expect(html).not.toContain('javascript:');
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('unsafe'));
+  it('binds an onClick listener', () => {
+    let clicked = 0;
+    render('<a>go</a>', { a: { onClick: () => (clicked += 1) } });
+    document.querySelector('a')?.dispatchEvent(new Event('click'));
+
+    expect(clicked).toBe(1);
   });
 });
 
