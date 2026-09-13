@@ -24,7 +24,7 @@ const TAG_NAME = String.raw`[A-Za-z][A-Za-z0-9-]*(?=[\s/>])`;
  * recursive call below would overwrite the outer loop's position. That is a real hang,
  * not a theoretical one.
  */
-const TAG_PATTERN = String.raw`<(${TAG_NAME})[^>]*>([\s\S]*?)<\/\1\s*>|<(${TAG_NAME})[^>]*\/>`;
+const TAG_PATTERN = String.raw`<(${TAG_NAME})[^>]*(?<!\/\s*)>([\s\S]*?)<\/\1\s*>|<(${TAG_NAME})[^>]*\/>`;
 
 /* Any tag at all, used only to answer "are there tags in here?". */
 const ANY_TAG = String.raw`<\/?${TAG_NAME}[^>]*\/?>`;
