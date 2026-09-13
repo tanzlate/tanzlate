@@ -1,5 +1,21 @@
 # i18next-compose-vue
 
+## 0.4.0
+
+### Minor Changes
+
+- dadc751: Fix component rendering after a language switch, and warn instead of silently failing on an
+  unregistered component
+- 0935649: Declare `vue` as a peer dependency instead of a dependency, so consumers no longer risk a second
+  Vue copy in their app
+
+### Patch Changes
+
+- dadc751: Fix translation parser corrupting same-name nested tags and quoted attributes containing `>`
+- 0eacd0c: Fix a self-closing tag being read as the opening of a later paired tag with the same name
+- Updated dependencies [5fd3ede]
+  - @tanzlate/vanilla@0.4.1
+
 ## 0.3.0
 
 ### Minor Changes
