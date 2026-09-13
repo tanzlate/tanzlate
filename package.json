@@ -44,7 +44,7 @@
     "@use-compose/logger": "0.0.6",
     "eslint": "10.9.1",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-vue": "10.10.0",
+    "eslint-plugin-vue": "10.11.0",
     "globals": "17.11.0",
     "happy-dom": "18.0.1",
     "husky": "9.1.7",
