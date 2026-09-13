@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - dev
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  lint-format-build:
+    if: ${{ ! startsWith(github.event.pull_request.head.ref, 'renovate/') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format
+        run: pnpm exec prettier --check .
+
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm vitest run
+
+  build-docs:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    needs: lint-format-build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+
+      # docs has no `build` script, so `pnpm -r build` skips it.
+      - name: Build with VitePress
+        run: pnpm docs:build
+
+      - name: Upload site
+        uses: actions/upload-artifact@v7
+        with:
+          name: docs-build
+          path: ./docs/.vitepress/dist/
+          if-no-files-found: error
+
+  deploy:
+    needs: build-docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download site
+        uses: actions/download-artifact@v8
+        with:
+          name: docs-build
+          path: ./site
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: unnecessary
+
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      # Trailing slash copies contents, not the folder.
+      # --delete removes stale hashed assets, which otherwise pile up forever.
+      - name: Deploy build with rsync
+        run: |
+          rsync -avz --delete \
+            ./site/ \
+            ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:/var/www/tanzlate.dev/

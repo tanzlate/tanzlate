@@ -22,7 +22,23 @@ The starting point is usually a hardcoded template with components inline:
 </template>
 ```
 
-With tanzlate you extract the sentence into a translation string and map the component tags:
+With tanzlate you extract the sentence into a translation string and map the component tags.
+
+::: warning PascalCase components must be registered
+`:components` supplies **props for** a tag — it never resolves the component itself. Register
+PascalCase components once with [`registerComponent`](#component-registry). An unregistered tag
+does not render as a component: its text stays visible and a console warning names the tag. Lowercase HTML tags (`<a>`, `<strong>`, `<b>`) work with no registration.
+
+```ts
+import { registerComponent } from '@tanzlate/vue';
+import UserBadge from '@/components/UserBadge.vue';
+import AppButton from '@/components/AppButton.vue';
+
+registerComponent('UserBadge', UserBadge);
+registerComponent('AppButton', AppButton);
+```
+
+:::
 
 ```json
 {
@@ -48,7 +64,7 @@ Props removed from the template move into the `:components` object. The translat
 
 ## HTML tags
 
-Lowercase tags (`<b>`, `<a>`, `<strong>`) are rendered as real HTML elements — no `v-html` needed:
+Lowercase tags (`<b>`, `<a>`, `<strong>`) are rendered as real HTML elements — no `v-html` and **no registration** needed:
 
 ```json
 { "help": "Read the <a>documentation</a> or ask on <strong>Discord</strong>." }
@@ -122,4 +138,12 @@ import UserBadge from '@/components/UserBadge.vue';
 registerComponent('UserBadge', UserBadge);
 ```
 
-The `:components` prop takes priority over the registry when both supply the same tag.
+The two are not alternatives — they do different jobs:
+
+|                     | Resolves the tag to a component | Supplies props |
+| ------------------- | ------------------------------- | -------------- |
+| `registerComponent` | ✅ required for PascalCase      | —              |
+| `:components`       | ❌ never                        | ✅ per usage   |
+
+So a PascalCase tag needs `registerComponent`. `:components` is optional on top, for props that
+vary between usages.

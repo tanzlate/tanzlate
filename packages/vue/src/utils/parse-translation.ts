@@ -7,91 +7,69 @@ export {
   type FlatComponent,
 };
 
-/**
- * TAG_NAME is used to build the regexes
- * - It matches tag names like:
- *   - PascalCase: <NuxtLink>
- *   - kebab-case: <my-component> or HTML tags like <strong>
- *   - Component with numeric suffixes: <NuxtLink-1>, <my-component-2>
+/*
+ * Accepted tag names, used by every pattern below:
+ *
+ *   [A-Za-z][A-Za-z0-9-]*(?=[\s/>])
+ *
+ * - PascalCase components ......... <NuxtLink>
+ * - kebab-case and HTML tags ...... <my-component>, <strong>
+ * - numeric suffix for repeats .... <NuxtLink-2>, <my-component-2>
+ *
+ * Underscores are excluded on purpose -- snake_case is not a Vue component convention.
+ * The (?=[\s/>]) after the name is what enforces it: without it the attributes group
+ * swallows the rest, so <my_component> parsed as a <my> tag with attributes "_component".
+ *
+ * --------------------------------------------
+ *
+ * We need to consider 3 cases:
+ * 1 Opening tags (e.g. <NuxtLink>)
+ * 2 Closing tags (e.g. </NuxtLink>)
+ * 3 Self-closing tags (e.g. <NuxtLink />, which in this case could refer to a class as the logo in the login page)
+ *
+ * We will then inject the props directly in the template that call the Tanzlate component
+ * in the case 3 it's more straightforward but in the case 1 and 2 we need to also keep the content inside the tag
+ *
+ * These are 3 RegEx that we can use to detect components or tags in the translation value.
+ * All of them also support kebab-case, in case of an external library.
  */
-const TAG_NAME = '([A-Za-z][\\w-]*)'; // allows PascalCase, kebab-case, and suffixes like -1
 
 const i18nRegex = {
   /*
-   * We need to consider different cases:
-   * 1 Opening tags (e.g. <NuxtLink>)
-   * 2 Closing tags (e.g. </NuxtLink>)
-   * 3 Self-closing tags (e.g. <NuxtLink />, which in this case could refer to a class as the logo in the login page)
-   * 4 Tag with optional numeric suffix (e.g. <NuxtLink-1> or <NuxtLink-2>) if this component is used multiple times in the same translation string
+   * Self-closing tags.
+   *   <Tag />        <Tag ... />        <Tag-2 />
    *
-   * We will then inject the props directly in the template that call the  ̶R̶t̶T̶r̶a̶n̶s̶l̶a̶t̶e̶ Translate component
-   * in the case 3 it's more straightforward but in the case 1 and 2 we need to also keep the content inside the tag
+   * Groups: 1 tag name, 2 attributes (unused)
    *
-   * These are 3 RegEx that we can use to detect components or tags in the translation value
-   * All of them also support snake-case in case of third-party components
-   *
+   * regex101: TODO save and paste link
    */
+  selfClosingTags: /<([A-Za-z][A-Za-z0-9-]*)(?=[\s/>])\s*([^>]*)\s*\/>/g,
 
-  TAG_NAME: '([A-Za-z][\\w-]*)', // allows PascalCase, kebab-case, and suffixes like -1
-
-  // selfClosingAndOpeningTagsOnly: new RegExp(`<${TAG_NAME}\\s*/>`, 'g'),
-
-  /**
-   * Matches self-closing tags
-   * E.g. <Tag ... />
-   * Or in the case of multiple same tags with suffixes: <Tag-1 ... />
+  /*
+   * Any tag at all -- opening, closing or self-closing. Used only to answer
+   * "does this string contain tags?", never to extract content.
+   *   <Tag>          </Tag>             <Tag />
    *
-   * Groups:
-   *  1: tag name
-   *  2: attributes (unused)
+   * Groups: 1 opening name, 2 attributes (unused), 3 self-closing slash, 4 closing name
+   *
+   * regex101: TODO save and paste link
    */
-  selfClosingTags: new RegExp(`<${TAG_NAME}\\s*([^>]*)\\s*/>`, 'g'),
+  allTypesOfTags:
+    /<([A-Za-z][A-Za-z0-9-]*)(?=[\s/>])\s*([^>]*)\s*(\/?)>|<\/([A-Za-z][A-Za-z0-9-]*)\s*>/g,
 
-  // selfClosingOpeningAndClosingTags: new RegExp(
-  //   `<${TAG_NAME}\\s*([^>]*)\\s*(?:/)?>(?:</${TAG_NAME}\\s*>)?|</${TAG_NAME}\\s*>`,
-  //   'g',
-  // ),
-
-  /**
-   * Matches all types of tags: opening, closing, and self-closing
-   * E.g. <Tag ...>, </Tag>, <Tag ... />
-   * Or in the case of multiple same tags with suffixes: <Tag-1 ...>, </Tag-1>, <Tag-1 ... />
+  /*
+   * A paired tag with everything between it. The \1 backreference is what ties the closing
+   * tag to the opening one, so <b>x</b> matches but <b>x</i> does not.
+   * The (?<!\/\s*) refuses a "/" just before ">", so <Icon /> is never read as the opening of
+   * a later <Icon>...</Icon> -- otherwise both nodes merge into one.
+   *   <Tag>inner</Tag>               <Tag-2>inner</Tag-2>
    *
-   * Used for recursive parsing when we need to find all tags in a string
+   * Groups: 1 tag name, 2 attributes (unused), 3 inner content
    *
-   * Groups:
-   *  1: opening/self-closing tag name
-   *  2: attributes (unused)
-   *  3: self-closing slash (if any)
-   *  4: closing tag name
+   * https://regex101.com/r/3SXgzD/1
    */
-  allTypesOfTags: new RegExp(`<${TAG_NAME}\\s*([^>]*)\\s*(/?)>|</${TAG_NAME}\\s*>`, 'g'),
-
-  // Paired OR self-closing, with content captured when paired.
-  // Groups:
-  //  1: paired tag name, 2: attributes (unused), 3: inner content
-  //  4: self-closing tag name
-  allTagsWithContent: new RegExp(
-    `<${TAG_NAME}\\s*([^>]*)\\s*(?:/)?>([\\s\\S]*?)</\\1\\s*>|<${TAG_NAME}\\s*/>`,
-    'g',
-  ),
-
-  /**
-   * Matches opening and closing tags, and captures inner content.
-   * E.g. <Tag ...>inner</Tag>
-   * Or in the case of multiple same tags with suffixes: <Tag-1 ...>inner</Tag-1>
-   *
-   * Groups:
-   *  1: tag name
-   *  2: attributes (unused)
-   *  3: inner content
-   */
-  openingAndClosingTagsWithContent: new RegExp(
-    `<${TAG_NAME}\\s*([^>]*)\\s*(?:/)?>([\\s\\S]*?)</\\1\\s*>`,
-    'g',
-  ),
-
-  standaloneTags: new RegExp(`<${TAG_NAME}\\s*([^>]*)\\s*(?:/)?>(?:</\\1\\s*>)?`, 'g'),
+  openingAndClosingTagsWithContent:
+    /<([A-Za-z][A-Za-z0-9-]*)(?=[\s/>])\s*([^>]*)(?<!\/\s*)>([\s\S]*?)<\/\1\s*>/g,
 };
 
 /**

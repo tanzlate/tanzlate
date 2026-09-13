@@ -1,6 +1,6 @@
-import { setupI18nContext } from '@/composables/context';
 import { CoreContext, Createi18nConfigParams, useCoreContext } from '@tanzlate/vanilla';
 import { defineComponent, h, PropType, Suspense } from 'vue';
+import { setupI18nContext } from '../composables/context';
 
 export default defineComponent({
   name: 'I18nProvider',

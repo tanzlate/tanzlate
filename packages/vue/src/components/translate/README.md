@@ -28,7 +28,7 @@ Here's what I propose:
 
 ## 1. Using a function to detect the presence of Vue components (or not) inside the translation
 
-I implemented a method which uses a custom Regex [to recognize any component present inside the translation value](https://github.com/reteach/reteach-app/pull/3092/files#diff-b05b85a934d3b39d1eda21a661ac9eaead2d1b26f72a99176c0fb323c3847715R102-R109). It works for for opening, closing, self-closing and snake-case tags (in case of an external library for example)
+I implemented a method which uses a custom Regex [to recognize any component present inside the translation value](https://github.com/reteach/reteach-app/pull/3092/files#diff-b05b85a934d3b39d1eda21a661ac9eaead2d1b26f72a99176c0fb323c3847715R102-R109). It works for opening, closing, self-closing and kebab-case tags (in case of an external library for example)
 
 It will return `null` or and array or component tags such as
 
