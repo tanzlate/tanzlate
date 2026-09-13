@@ -60,6 +60,8 @@ const i18nRegex = {
   /*
    * A paired tag with everything between it. The \1 backreference is what ties the closing
    * tag to the opening one, so <b>x</b> matches but <b>x</i> does not.
+   * The (?<!\/\s*) refuses a "/" just before ">", so <Icon /> is never read as the opening of
+   * a later <Icon>...</Icon> -- otherwise both nodes merge into one.
    *   <Tag>inner</Tag>               <Tag-2>inner</Tag-2>
    *
    * Groups: 1 tag name, 2 attributes (unused), 3 inner content
@@ -67,7 +69,7 @@ const i18nRegex = {
    * https://regex101.com/r/3SXgzD/1
    */
   openingAndClosingTagsWithContent:
-    /<([A-Za-z][A-Za-z0-9-]*)(?=[\s/>])\s*([^>]*)\s*(?:\/)?>([\s\S]*?)<\/\1\s*>/g,
+    /<([A-Za-z][A-Za-z0-9-]*)(?=[\s/>])\s*([^>]*)(?<!\/\s*)>([\s\S]*?)<\/\1\s*>/g,
 };
 
 /**

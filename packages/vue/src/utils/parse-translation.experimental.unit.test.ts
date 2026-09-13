@@ -48,6 +48,7 @@ const strings: [string, string][] = [
   ['self-closing alone', '<UserBadge />'],
   ['self-closing kebab', 'A <third-party-library-component /> here.'],
   ['siblings same name', '<b>one</b> and <b>two</b>'],
+  ['self-closing then paired, same name', '<Icon /> then <Icon>label</Icon>'],
   ['three levels', '<Card><b>bold <i>italic</i></b></Card>'],
   ['snake_case (out of scope)', '<my_component>x</my_component>'],
   ['unclosed', 'before <b>after'],
@@ -58,6 +59,15 @@ const strings: [string, string][] = [
 describe('experimental parser matches the current one', () => {
   it.each(strings)('%s', (_name, input) => {
     expect(experimental(input)).toEqual(current(input));
+  });
+
+  // Parity alone cannot catch a defect both parsers share, so pin the expected output.
+  it('keeps a self-closing and a paired tag of the same name apart', () => {
+    expect(experimental('<Icon /> then <Icon>label</Icon>')).toEqual([
+      { tag: 'Icon' },
+      ' then ',
+      { tag: 'Icon', content: 'label' },
+    ]);
   });
 
   it('terminates on nested tags (the case that hangs translation-parser.ts.OLD)', () => {

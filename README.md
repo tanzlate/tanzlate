@@ -55,6 +55,9 @@ With tanzlate the whole sentence stays in one string, written the way you'd writ
 ```ts
 // once, at app startup
 import { registerComponent } from '@tanzlate/vue';
+import UserBadge from '@/components/UserBadge.vue';
+import AppButton from '@/components/AppButton.vue';
+
 registerComponent('UserBadge', UserBadge);
 registerComponent('AppButton', AppButton);
 ```

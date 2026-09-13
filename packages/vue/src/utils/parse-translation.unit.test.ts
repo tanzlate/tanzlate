@@ -45,6 +45,14 @@ describe('parseTranslation', () => {
     ]);
   });
 
+  it('keeps a self-closing and a paired tag of the same name apart', () => {
+    expect(parseTranslation('<Icon /> then <Icon>label</Icon>')).toEqual([
+      { tag: 'Icon' },
+      ' then ',
+      { tag: 'Icon', content: 'label' },
+    ]);
+  });
+
   it('parses sibling tags of the same name', () => {
     expect(parseTranslation('<b>one</b> and <b>two</b>')).toEqual([
       { tag: 'b', content: 'one' },

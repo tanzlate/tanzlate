@@ -26,11 +26,14 @@ With tanzlate you extract the sentence into a translation string and map the com
 
 ::: warning PascalCase components must be registered
 `:components` supplies **props for** a tag — it never resolves the component itself. Register
-PascalCase components once with [`registerComponent`](#component-registry) or the tag renders as
-nothing. Lowercase HTML tags (`<a>`, `<strong>`, `<b>`) work with no registration.
+PascalCase components once with [`registerComponent`](#component-registry). An unregistered tag
+does not render as a component: its text stays visible and a console warning names the tag. Lowercase HTML tags (`<a>`, `<strong>`, `<b>`) work with no registration.
 
 ```ts
 import { registerComponent } from '@tanzlate/vue';
+import UserBadge from '@/components/UserBadge.vue';
+import AppButton from '@/components/AppButton.vue';
+
 registerComponent('UserBadge', UserBadge);
 registerComponent('AppButton', AppButton);
 ```
