@@ -1,5 +1,11 @@
 # core
 
+## 0.4.1
+
+### Patch Changes
+
+- 5fd3ede: Let a caller's `interpolation` options reach i18next
+
 ## 0.4.0
 
 ### Minor Changes
