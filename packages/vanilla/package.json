@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@tanzlate/core": "workspace:*",
-    "i18next": "25.8.0",
+    "i18next": "25.10.10",
     "i18next-fs-backend": "2.6.0"
   },
   "devDependencies": {
