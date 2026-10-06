@@ -10,7 +10,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "i18next": "25.8.0"
+    "i18next": "25.10.10"
   },
   "devDependencies": {
     "typescript": "5.9.3",

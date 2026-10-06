@@ -14,7 +14,7 @@
   "dependencies": {
     "@tanzlate/core": "workspace:*",
     "@tanzlate/vanilla": "workspace:*",
-    "i18next": "25.8.0"
+    "i18next": "25.10.10"
   },
   "devDependencies": {
     "@playwright/test": "1.54.1",
