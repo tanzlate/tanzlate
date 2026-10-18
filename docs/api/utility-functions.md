@@ -53,8 +53,9 @@ const ctx = await useCoreContext({
   },
 });
 
-const t = ctx.composeHelper('my_namespace');
-console.log(t('hello')); // → "Hello"
+// composeHelper takes the *context* (second key level), not the namespace
+const tanz = ctx.composeHelper('home');
+console.log(tanz('hello')); // → "Hello"
 ```
 
 ## i18nFormatterHelper

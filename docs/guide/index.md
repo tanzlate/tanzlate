@@ -1,47 +1,19 @@
 ---
-title: Getting Started
+title: Guide
 titleTemplate: tanzlate
-description: Overview of the tanzlate core package — parsing and interpolation without framework bindings.
+description: Where to start with tanzlate.
 outline: [2, 3]
 sidebarDepth: 2
 ---
 
-# Getting Started
+# Guide
 
-tanzlate is a framework-agnostic i18n library built on top of i18next. It adds component interpolation, namespace helpers, and framework-specific renderers for Vue and React.
+tanzlate is an i18n library built on top of i18next. It adds component interpolation inside
+translation strings and namespace-scoped helpers. The Vue renderer is published; React is planned.
 
-## Installation
-
-::: code-group
-
-```bash [npm]
-npm install @tanzlate/core
-```
-
-```bash [yarn]
-yarn add @tanzlate/core
-```
-
-```bash [pnpm]
-pnpm add @tanzlate/core
-```
-
-:::
-
-For Vue:
-
-::: code-group
-
-```bash [npm]
-npm install @tanzlate/vue
-```
-
-```bash [yarn]
-yarn add @tanzlate/vue
-```
-
-```bash [pnpm]
-pnpm add @tanzlate/vue
-```
-
-:::
+- [Motivation](/motivation) — why it exists
+- [Getting Started](/guide/getting-started) — install and a working example
+- [Features](/guide/features) — comparison table
+- [Vue](/vue/) — the Vue renderer
+- [Vanilla JS](/vanilla/) — the framework-agnostic layer
+- [Best Practices](/best-practices/) — key naming and conventions
