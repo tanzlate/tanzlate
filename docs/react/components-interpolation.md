@@ -1,11 +1,18 @@
 ---
-title: Translation Interpolation
+title: Components Interpolation (planned)
 titleTemplate: tanzlate
-description: Using the Trans component to render complex translations with components and values.
+description: Design sketch for the future React renderer. Not published.
 outline: [2, 3]
 ---
 
-# Components Interpolation
+# Components Interpolation (planned)
+
+::: danger Not published yet
+`@tanzlate/react` does **not exist on npm**. This page is a design sketch for a future package, kept
+here so the intended API is written down. `npm install @tanzlate/react` will fail.
+
+Only [`@tanzlate/vue`](/vue/) and [`@tanzlate/vanilla`](/vanilla/) are published today.
+:::
 
 Support for rendering React components and HTML tags with custom props inside translation strings, with a focus on human-readable strings.
 
@@ -13,14 +20,14 @@ Support for rendering React components and HTML tags with custom props inside tr
 
 The `<Trans>` component accepts:
 
-- The current translation function (`cT` from `useI18n`) in a given context
+- The current translation function (`tanz` from `useI18n`) in a given context
 - The translation key
 - Optional interpolation values
 - The list of components to interpolate, as an object where props are passed inline
 
 ```tsx
 <Trans
-  t={cT}
+  t={tanz}
   i18nKey="interpolate_with_complex_translation"
   components={{
     Link: { to: toCourseList },

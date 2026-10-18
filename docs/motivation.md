@@ -5,7 +5,7 @@ order: 1
 
 # tanzlate
 
-![NPM Package Version](https://img.shields.io/npm/v/@tanzlate/core?color=519ea9)
+![NPM Package Version](https://img.shields.io/npm/v/@tanzlate/vue?color=519ea9)
 
 A lightweight library to manage translations with **component interpolation** and **complex translation strings**.
 
@@ -23,31 +23,31 @@ tanzlate provides a modular and efficient way to keep everyone aligned, without 
 
 ---
 
-Built with a generic **core** package and framework-specific renderers for **Vue** and **React**.
+Built with a generic **core** package and a **Vue** renderer. A React renderer is planned.
 
 ::: tip Why?
 Translations often involve developers, translators, designers, and product owners.  
 This library keeps everyone aligned by making complex translations easier to manage.
 :::
 
-- [Vanilla JS →](/vanilla/)
 - [Vue →](/vue/)
-- [React →](/react/)
+- [Vanilla JS →](/vanilla/)
+- [React → (planned)](/react/)
 
 ## Installation
 
 ::: code-group
 
 ```bash [npm]
-npm install @tanzlate/core
+npm install @tanzlate/vue
 ```
 
 ```bash [yarn]
-yarn add @tanzlate/core
+yarn add @tanzlate/vue
 ```
 
 ```bash [pnpm]
-pnpm add @tanzlate/core
+pnpm add @tanzlate/vue
 ```
 
 :::
