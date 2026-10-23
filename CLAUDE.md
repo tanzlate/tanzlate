@@ -66,6 +66,12 @@ _vanilla_ package's tests.
   prefixes are required, and do not reintroduce commitlint without being asked.
 - `.husky/pre-commit` runs `lint-staged`: `eslint --fix` on JS/TS and `prettier --write` on
   everything else.
+- **`ci.yml` and `ci-renovate.yml` are a matched pair.** `ci.yml` skips branches named
+  `renovate/*`; `ci-renovate.yml` is the half that runs them. Deleting or editing the `if:`
+  on one without the other means dependency PRs run **no checks**, and `automerge` in
+  `renovate.json` then lands them unverified. That is how i18next 25.10.10 (#138) broke
+  `dev` for two weeks. Renovate also uses `automergeType: "pr"` on purpose — `"branch"`
+  merges without opening a PR, so no `pull_request` workflow would fire at all.
 
 ## Releases
 

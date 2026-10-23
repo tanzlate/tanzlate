@@ -1,0 +1,43 @@
+# Counterpart to ci.yml, which skips `renovate/*` branches so that dependency
+# PRs do not double-run the whole matrix on every rebase. Without this file the
+# exclusion means renovate PRs run *no* checks at all, and `automerge` in
+# renovate.json then lands them unverified -- which is how i18next 25.10.10
+# (#138) broke `dev` for two weeks.
+name: CI (Renovate)
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+concurrency:
+  group: ci-renovate-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint-format-build:
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'renovate/') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format
+        run: pnpm exec prettier --check .
+
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm vitest run
