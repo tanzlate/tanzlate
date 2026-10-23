@@ -1,5 +1,4 @@
 import { InitOptions } from 'i18next';
-import type { FsBackendOptions } from 'i18next-fs-backend';
 import { createI18nAppInstance } from './i18n-app';
 import { I18nApp } from './types';
 import { Createi18nConfigParams } from './types/config';
@@ -29,6 +28,7 @@ async function initI18nConfig({
   supportedLanguages,
   resources,
   initAsync = false,
+  modules,
   backend,
   interpolation,
 }: Createi18nConfigParams): Promise<I18nApp> {
@@ -47,20 +47,20 @@ async function initI18nConfig({
     interpolation: { ...i18NConfigOptions.interpolation, ...interpolation },
   };
 
-  // const opts = configureOptions(i18NConfig);
+  // Plugins must be registered before init.
+  for (const module of modules ?? []) {
+    initializedI18n.use(module);
+  }
 
   if (backend) {
-    const { default: FsBackend } = await import('i18next-fs-backend');
-    initializedI18n.use(FsBackend);
-    const fsBackendConfig: FsBackendOptions = {
-      loadPath: backend?.loadPath,
-      addPath: backend?.addPath,
-      ident: backend?.ident,
-      parse: backend?.parse,
-      stringify: backend?.stringify,
-      expirationTime: backend?.expirationTime,
-    };
-    i18NConfig.backend = fsBackendConfig;
+    if (!modules?.length) {
+      throw new Error(
+        '[tanzlate] `backend` options were provided but no backend module. ' +
+          'Register one via `modules`, e.g. initI18nConfig({ modules: [FsBackend], backend: { loadPath } }).',
+      );
+    }
+    // Passed straight through, so any backend's own options survive.
+    i18NConfig.backend = backend;
   }
 
   await initializedI18n.init(i18NConfig);

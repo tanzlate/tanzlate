@@ -86,9 +86,11 @@ const i18nConfig: Createi18nConfigParams = {
 </script>
 ```
 
-::: warning `I18nProvider` needs an outer `<Suspense>`
-Its `setup` is `async`, so the **parent** has to provide a `<Suspense>` boundary. It also renders a
-`<div class="i18n-provider">` around your children, which can matter for layout.
+::: warning `I18nProvider` needs an outer `<Suspense>` here
+Given `i18next-config`, it awaits the i18next init, so the **parent** has to provide a `<Suspense>`
+boundary. (If you build the context yourself and pass `i18n-context` instead, it stays synchronous
+and needs no boundary.) It also renders a `<div class="i18n-provider">` around your children, which
+can matter for layout.
 :::
 
 ## 3. Translate

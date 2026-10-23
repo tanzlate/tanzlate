@@ -36,8 +36,11 @@ language changes do not re-trigger it the way a key does.
 
 ## `<I18nProvider>`
 
-Requires an outer `<Suspense>` (its `setup` is `async`) and renders a
-`<div class="i18n-provider">` around its children.
+Renders a `<div class="i18n-provider">` around its children.
+
+Needs an outer `<Suspense>` **only** when given `i18next-config`, since it then initializes i18next
+and `setup` returns a promise. With a pre-resolved `i18n-context` nothing is awaited and no boundary
+is required.
 
 ### Props
 
