@@ -53,6 +53,7 @@ const ctx = await useCoreContext({
     supportedLanguages: ['en', 'de'],
     resources: { en: EN_TRANSLATION, de: DE_TRANSLATION },
   },
+  ssr: false, // required outside a browser -- see the warning below
 });
 
 const tanz = ctx.composeHelper('home');
@@ -61,8 +62,46 @@ tanz('welcome'); // → "Welcome to tanzlate"
 await ctx.lang('de');
 ```
 
-`useCoreContext` returns a stub context when `ssr` is true (the default when there is no `window`),
-so it is safe to call during server rendering.
+::: warning `ssr` defaults to `typeof window === 'undefined'`
+Which means it is `true` in any Node process, and `useCoreContext` then returns a **no-op stub**
+whose `composeHelper` yields `''` for every key. Nothing throws and nothing warns. Outside a
+browser you must pass `ssr: false` explicitly.
+
+The stub exists for SSR hydration — the server renders a stub, the client hydrates the real
+context. It is not meant as a permanent state.
+:::
+
+## Server-side and concurrent use
+
+`@tanzlate/vanilla` is built around a client app's lifecycle: one active language on one shared
+instance, mutated by `lang()` and observed through `onLangChange()`. On a backend serving
+concurrent requests in different locales, mutating that shared language is a race.
+
+For that case use `@tanzlate/core` directly with your own i18next instance, and pass `lng` per
+call instead of ever changing the active language:
+
+```ts
+import { i18nFormatterHelper } from '@tanzlate/core';
+import i18next from 'i18next';
+
+const instance = i18next.createInstance();
+await instance.init({ fallbackLng: 'en', resources });
+
+const { translationHelper } = i18nFormatterHelper(instance);
+const tanz = translationHelper('home');
+
+tanz('welcome', { lng: 'de' });
+```
+
+## Missing keys
+
+A missing key returns the **prefixed lookup key itself**, not `''` and not the bare key:
+
+```ts
+ctx.composeHelper('countries')('Japan'); // → "countries.Japan" if the key is missing
+```
+
+Guard with the underlying instance when that matters: `ctx.i18nApp.exists('ns:key', { lng })`.
 
 | Member          | Type                              | Description                       |
 | --------------- | --------------------------------- | --------------------------------- |
