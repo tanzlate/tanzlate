@@ -1,13 +1,19 @@
 ---
 title: Research
-titleTemplate: i18next-compose-vue
+titleTemplate: tanzlate
 description: Research and exploration of translation strategies and best practices.
 outline: [2, 3]
 ---
 
 # Research
 
-Research and exploration of translation strategies for the i18next-compose project.
+::: info Historical notes
+These are the original design notes from before the library was named tanzlate. The API names here
+(`i18next-compose`, `<RtTranslate>`, `rtTranslate`) are what they were at the time — kept as written
+rather than retrofitted. The current API is in [Vue API](/vue/api).
+:::
+
+Research and exploration of translation strategies that led to tanzlate.
 
 # Inspiration from existing libraries
 

@@ -53,16 +53,19 @@ const ctx = await useCoreContext({
   },
 });
 
-const t = ctx.composeHelper('my_namespace');
-console.log(t('hello')); // → "Hello"
+// composeHelper takes the *context* (second key level), not the namespace
+const tanz = ctx.composeHelper('home');
+console.log(tanz('hello')); // → "Hello"
 ```
 
 ## i18nFormatterHelper
 
-Returns translation helper functions for a given i18next instance.
+Returns translation helper functions for a given i18next instance. Takes any i18next `i18n`,
+so it works with an instance you created yourself — see
+[Server-side and concurrent use](/vanilla/#server-side-and-concurrent-use).
 
 ```ts
-function i18nFormatterHelper(i18nApp: I18nApp): I18nFormatterHelper;
+function i18nFormatterHelper(i18nextInstance: i18n): I18nFormatterHelper;
 ```
 
 ## getFlagEmoji

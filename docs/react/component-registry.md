@@ -1,11 +1,18 @@
 ---
 outline: [2, 3]
 order: 3
-title: Component Registry
+title: Component Registry (planned)
 slug: /component-registry
 ---
 
-# Component Registry
+# Component Registry (planned)
+
+::: danger Not published yet
+`@tanzlate/react` does **not exist on npm**. This page is a design sketch for a future package, kept
+here so the intended API is written down. `npm install @tanzlate/react` will fail.
+
+Only [`@tanzlate/vue`](/vue/) and [`@tanzlate/vanilla`](/vanilla/) are published today.
+:::
 
 The registry lets you register React components or native HTML tags by name so they can be used inside your interpolated translations.
 

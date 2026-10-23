@@ -1,29 +1,29 @@
 ---
 layout: home
 title: tanzlate
-titleTemplate: Vanilla JS + Vue + React
-description: Framework-agnostic i18n library with Vue and React renderers for component interpolation.
+titleTemplate: i18n for Vue 3 and Nuxt
+description: i18n for Vue 3 and Nuxt, built on i18next — render real components inside your translation strings.
 hero:
   name: tanzlate
-  text: Vanilla JS + Vue + React
-  tagline: Component-friendly i18n — parse once, render anywhere.
+  text: Component interpolation for Vue
+  tagline: Keep the whole sentence in one translation key. Register components once, pass props per usage.
   actions:
     - theme: brand
+      text: Get Started
+      link: /guide/getting-started
+    - theme: alt
+      text: Component Interpolation
+      link: /vue/components-interpolation
+    - theme: alt
       text: Vanilla JS
       link: /vanilla/
-    - theme: alt
-      text: Vue
-      link: /vue/
-    - theme: alt
-      text: React
-      link: /react/
 features:
-  - title: Vanilla JS package
-    details: Parse translation strings into an AST and resolve interpolations.
-  - title: Vue & React renderers
-    details: Map AST to real components with clean APIs.
-  - title: Translator-friendly strings
-    details: Keep logic in code and components out of translation attributes.
+  - title: Components inside translation strings
+    details: '"Your <UserBadge /> is ready. <AppButton>Start tour</AppButton>" renders as real Vue components — one key, no template slots.'
+  - title: Register once, props per usage
+    details: registerComponent resolves a tag app-wide. The :components prop supplies only props, so the same component can appear in hundreds of strings.
+  - title: Namespace-scoped helpers
+    details: useI18n('home') scopes keys to a context. No global $t, no guessing which component owns a key.
 outline: [2, 3]
 sidebar: false
 ---
@@ -40,11 +40,11 @@ flowchart LR
 
   F1 --> I
 
-  C[["@tanzlate/core<br/>parseTranslationString → AST<br/>resolveInterpolations → AST'"]]
+  C[["@tanzlate/vanilla<br/>i18next runtime<br/>namespace helpers"]]
 
   subgraph FW["Framework Renderers"]
-    V["@tanzlate/vue<br /><RtTranslate>"]
-    R["@tanzlate/react<br /><Trans>"]
+    V["@tanzlate/vue<br />parse → &lt;Tanzlate&gt;"]
+    R["@tanzlate/react<br />(planned)"]
   end
 
   I -->|string| C
@@ -52,8 +52,8 @@ flowchart LR
   C --> R
 
   subgraph Inputs["Per-Framework Inputs"]
-    VC["components + componentProps <br />(e.g., { NuxtLink }, <br />{ NuxtLink: { to:'/courses' } })"]
-    RC["components + componentProps <br />(e.g., { Link }, <br />{ Link: <br />{ to:'/courses' }<br /> })"]
+    VC["registerComponent('NuxtLink', NuxtLink) <br />once per app<br /><br />:components = <br />{ NuxtLink: { to:'/courses' } }<br />props, per usage"]
+    RC["(planned)"]
   end
 
   VC --> V
@@ -112,8 +112,8 @@ sequenceDiagram
     participant CW as CW / Translator
     participant Repo as i18n JSON (per locale)
     participant Dev as Developer
-    participant App as Vue App (<RtTranslate/>)
-    participant Parser as RtTranslate Parser
+    participant App as Vue App (&lt;Tanzlate/&gt;)
+    participant Parser as Tanzlate Parser
     participant User as End User
 
     Note over CW,Dev: Conventions: namespaces, tag allow-list, props schema

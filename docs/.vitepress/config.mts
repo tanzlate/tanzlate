@@ -16,6 +16,15 @@ const sidebar = {
       items: [{ text: 'Getting Started', link: '/guide/getting-started' }],
     },
     {
+      text: 'Vue',
+      items: [
+        { text: 'Getting Started', link: '/vue/' },
+        { text: 'Component Interpolation', link: '/vue/components-interpolation' },
+        { text: 'Component Registry', link: '/vue/component-registry' },
+        { text: 'API', link: '/vue/api' },
+      ],
+    },
+    {
       text: 'Vanilla JS',
       items: [
         { text: 'Overview', link: '/vanilla/' },
@@ -31,12 +40,11 @@ const sidebar = {
       ],
     },
     {
-      text: 'Vue',
+      text: 'React (planned)',
       items: [
-        { text: 'Getting Started', link: '/vue/' },
-        { text: 'Component Interpolation', link: '/vue/components-interpolation' },
-        { text: 'Component Registry', link: '/vue/component-registry' },
-        { text: 'API', link: '/vue/api' },
+        { text: 'Overview', link: '/react/' },
+        { text: 'Component Interpolation', link: '/react/components-interpolation' },
+        { text: 'Component Registry', link: '/react/component-registry' },
       ],
     },
     {
@@ -49,15 +57,17 @@ const sidebar = {
 const config = defineConfig({
   title: 'tanzlate',
   description: 'i18n for Vue 3 and Nuxt — with full component interpolation.',
+  srcExclude: ['README.md', 'CHANGELOG.md'],
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/getting-started' },
+      { text: 'Vue', link: '/vue/' },
     ],
 
     sidebar: sidebar,
 
-    socialLinks: [{ icon: 'github', link: 'https://github.com/use-compose/tanzlate' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/tanzlate/tanzlate' }],
   },
   cleanUrls: true,
 });

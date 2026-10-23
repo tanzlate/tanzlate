@@ -41,7 +41,7 @@ The context object returned by `useCoreContext`.
 ```ts
 interface CoreContext {
   i18nApp: I18nApp;
-  composeHelper: (ns: string) => TFunc;
+  composeHelper: (context: string) => TFunc;
   lang: (lng?: string) => Promise<void>;
   onLangChange: (callback: (lng: string) => void) => () => void;
 }
@@ -50,7 +50,7 @@ interface CoreContext {
 ### Properties
 
 - `i18nApp`: The underlying i18next instance.
-- `composeHelper`: Returns a scoped translation function for a given namespace.
+- `composeHelper`: Returns a translation function scoped to a context (the second key level).
 - `lang`: Change the active language.
 - `onLangChange`: Subscribe to language changes. Returns an unsubscribe function.
 
