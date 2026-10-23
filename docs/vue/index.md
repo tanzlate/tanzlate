@@ -80,10 +80,13 @@ This makes reactive translation helpers available to child components via `useI1
 
 #### Render Behavior
 
-`I18nProvider` has an `async setup`, so **the parent must wrap it in `<Suspense>`** — the provider
-cannot supply its own boundary. It renders an inner `<Suspense>` plus a wrapper element
-`<div class="i18n-provider">` around your children, which is worth knowing when it lands in the
-middle of a flex or grid layout.
+Given `i18next-config`, as above, `setup` returns a promise — it has to await the i18next init —
+so **the parent must wrap it in `<Suspense>`**; the provider cannot supply its own boundary. Given a
+pre-resolved `i18n-context` it stays synchronous and needs no boundary.
+
+Either way it renders an inner `<Suspense>` plus a wrapper element `<div class="i18n-provider">`
+around your children, which is worth knowing when it lands in the middle of a flex or grid
+layout.
 
 Either `i18next-config` or `i18n-context` is required; passing neither throws.
 
