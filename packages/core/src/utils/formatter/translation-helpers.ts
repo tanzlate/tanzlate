@@ -25,9 +25,8 @@ function i18nFormatterHelper(i18nextInstance: i18n): I18nFormatterHelper {
    * @returns {cTFunc}
    */
   const translationHelper = (level2: Namespace): TFunc => {
-    // t contains the translation function from the given configuration.
-    // Narrowed to the signature TFunc exposes: i18next's overloads infer the key
-    // against typed resources, which a generic wrapper has no way to satisfy.
+    // i18next 25.9.0 (2026-03-20) rejects a template-literal key union, so the overload
+    // taking `options` drops out and TS falls through to (key, defaultValue: string).
     const t = i18nextInstance.t as (key: string, options?: TOptions) => string;
 
     /*
