@@ -1,6 +1,25 @@
 {
   "name": "@tanzlate/vue",
   "version": "0.3.0",
+  "description": "i18n for Vue 3 and Nuxt built on i18next, with real components interpolated inside translation strings.",
+  "keywords": [
+    "i18n",
+    "i18next",
+    "vue",
+    "vue3",
+    "nuxt",
+    "internationalization",
+    "translation",
+    "localization",
+    "component-interpolation",
+    "tanzlate"
+  ],
+  "license": "MIT",
+  "author": "Arthur Plazanet",
+  "homepage": "https://github.com/tanzlate/tanzlate#readme",
+  "bugs": {
+    "url": "https://github.com/tanzlate/tanzlate/issues"
+  },
   "private": false,
   "scripts": {
     "build": "run-p type-check \"build-only {@}\" --",

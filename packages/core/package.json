@@ -1,6 +1,21 @@
 {
   "name": "@tanzlate/core",
   "version": "0.3.0",
+  "description": "Shared types and translation helpers for tanzlate. Framework-agnostic, no i18next runtime.",
+  "keywords": [
+    "i18n",
+    "i18next",
+    "internationalization",
+    "translation",
+    "typescript",
+    "tanzlate"
+  ],
+  "license": "MIT",
+  "author": "Arthur Plazanet",
+  "homepage": "https://github.com/tanzlate/tanzlate#readme",
+  "bugs": {
+    "url": "https://github.com/tanzlate/tanzlate/issues"
+  },
   "private": false,
   "scripts": {
     "build": "tsc && vite build",

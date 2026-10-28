@@ -1,4 +1,4 @@
-# core
+# @tanzlate/vanilla
 
 ## 0.4.0
 

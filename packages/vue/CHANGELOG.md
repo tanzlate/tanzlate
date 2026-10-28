@@ -1,4 +1,4 @@
-# i18next-compose-vue
+# @tanzlate/vue
 
 ## 0.3.0
 

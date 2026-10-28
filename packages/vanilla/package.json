@@ -1,6 +1,22 @@
 {
   "name": "@tanzlate/vanilla",
   "version": "0.4.0",
+  "description": "Framework-agnostic i18next runtime for tanzlate: config, instance creation and namespace-scoped translation helpers.",
+  "keywords": [
+    "i18n",
+    "i18next",
+    "internationalization",
+    "translation",
+    "localization",
+    "typescript",
+    "tanzlate"
+  ],
+  "license": "MIT",
+  "author": "Arthur Plazanet",
+  "homepage": "https://github.com/tanzlate/tanzlate#readme",
+  "bugs": {
+    "url": "https://github.com/tanzlate/tanzlate/issues"
+  },
   "private": false,
   "scripts": {
     "build": "tsc && vite build",
