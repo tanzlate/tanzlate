@@ -1,162 +1,90 @@
-# i18next-compose-vue
+# @tanzlate/vue
 
-I will explain a bit the different solutions I tried
+[![npm](https://img.shields.io/npm/v/@tanzlate/vue?color=519ea9)](https://www.npmjs.com/package/@tanzlate/vue)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/tanzlate/tanzlate/blob/main/LICENSE)
 
-# Inspiration from existing libraries
+i18n for Vue 3 and Nuxt, built on [i18next](https://www.i18next.com/) — with real components
+interpolated **inside** translation strings.
 
-### 1. Component interpolation from [vue-i18next](https://panter.github.io/vue-i18next/guide/component-interpolation.html) and [i18next-vue](https://i18next.github.io/i18next-vue/guide/component-interpolation.html#component-interpolation)
-
-Especially the first one looked promising looking at this issue https://github.com/i18next/i18next-vue/issues/8 as it seemed more dynamic.
-
-But as you can see, they are both using a `<i18next>` component to interpolate Vue components and/or HTML tags directly and then some specific template or slots are needed, which is not super practical.
-
-Then I went to the React side...
-
-### 2. [Trans component from react-i18next](https://react.i18next.com/latest/trans-component#alternative-usage-which-lists-the-components-v11.6.0) or libs like [React HTML Parser](https://github.com/peternewnham/react-html-parser#readme)
-
-Which initially looks a bit more like what I wanted
-
-But as seen [here](https://github.com/i18next/react-i18next/blob/7e2c55b3931f0b65ca6287b2f3bd8c1dd0fe1798/src/TransWithoutContext.js#L2C19-L2C39) or [here](https://github.com/peternewnham/react-html-parser/blob/e89bba4f8022a92418186cfaacfd473e81e31d92/src/HtmlParser.js#L1) they are mostly using pure HTML parser libraries in the first place, which is what I wanted to do in the first place (using DOMParser https://developer.mozilla.org/en-US/docs/Web/API/DOMParser)
-
-Also find this library https://github.com/henrikjoreteg/html-parse-stringify?tab=readme-ov-file#what-does-the-ast-look-like which is the result form I kind of liked and wanted to have 😄
-
----
-
-# Solution proposal
-
-After multiple tries I finally chose to not use any DOMParser to parse the string translation, as it could lead to too much complexity with Vue component (as HTML tags are lowercase, `tagName` is [uppercase](https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName) and parsing through each tags could lead to some uncertainty)
-
-Here's what I propose:
-
-## 1. Using a function to detect the presence of Vue components (or not) inside the translation
-
-I implemented a method which uses a custom Regex [to recognize any component present inside the translation value](https://github.com/reteach/reteach-app/pull/3092/files#diff-b05b85a934d3b39d1eda21a661ac9eaead2d1b26f72a99176c0fb323c3847715R102-R109). It works for for opening, closing, self-closing and snake-case tags (in case of an external library for example)
-
-It will return `null` or and array or component tags such as
-
-```javascript
-["<NuxtLink>","</NuxtLink>"]`
+```json
+{ "welcome": "Hello <UserBadge />, <AppLink>your tour</AppLink> is ready." }
 ```
 
-## 2. Using a parsing function to correctly render the translation value based on the eixstence of Vue components
+That whole sentence stays in one key. Translators see the full context; you don't split it across
+template slots.
 
-Starting from this translation
-`Hallo und <NuxtLink>Wilkommen zurück</NuxtLink>! Viel Spaß <NuxtLink-2>mit unserer <SelfClosingComponent />App</NuxtLink-2><library-component> sie uns </library-component/> wissen`
+## Install
 
-The idea is to get something as such:
-
-```javascript
-[
-  'Hallo und ',
-  {
-    tag: 'NuxtLink',
-    content: 'Wilkommen zurück',
-  },
-  '! Viel Spaß ',
-  {
-    tag: 'NuxtLink-2',
-    // this would need to be recursively parsed
-    content: 'mit unserer <SelfClosingComponent />App',
-  },
-];
+```bash
+npm install @tanzlate/vue
 ```
 
-To make it easier to work with afterwards
+`@tanzlate/core` and `@tanzlate/vanilla` come with it. `vue` (`^3.5.0`) is a peer dependency.
 
-## 3. Using a single component to interpolate and handle complex translation values containing Vue components
-
-This component would accept the following props:
-
-- The current translations functions (`rtTranslate` or `rtGlobalT`for example) in a given context
-- The translation key
-- The potential params/values inside the translations
-- The list of components to interpolate, as an object where we will pass the props - as they could be dynamic, they won't be part of the translation string
+## Quick start
 
 ```vue
-<RtTranslate
-  :rt-translate="rtTranslate"
-  i18n-key="interpolate_with_complex_translation"
-  :components="{
-    NuxtLink: { to: toCourseList },
-    SelfClosingComponent: { prop1: 'prop1', prop2: 'prop2' },
-    'NuxtLink-2': { to: 'blablabla' },
-  }"
-/>
+<!-- app.vue -->
+<template>
+  <Suspense>
+    <I18nProvider :i18next-config="i18nConfig">
+      <RouterView />
+    </I18nProvider>
+  </Suspense>
+</template>
+
+<script setup lang="ts">
+import type { Createi18nConfigParams } from '@tanzlate/vanilla';
+import { I18nProvider } from '@tanzlate/vue';
+import EN from './locales/en.json';
+
+const i18nConfig: Createi18nConfigParams = {
+  namespace: 'app',
+  lng: 'en',
+  supportedLanguages: ['en', 'de'],
+  resources: { en: EN },
+};
+</script>
 ```
 
-By specifying `NuxtLink` through different names (`NuxtLink` and `NuxtLink-2`) we ensure to not overlap any existing properties.
+```vue
+<template>
+  <h1>{{ tanz('title') }}</h1>
+  <Tanzlate :t-z="tanz" i18n-key="welcome" :components="{ AppLink: { href: '/tour' } }" />
+</template>
 
-I used a render function (`h()`) (https://v2.vuejs.org/v2/guide/render-function) as the translation could end-up quite complex and a template wouldn't be efficient enough
+<script setup lang="ts">
+import { Tanzlate, useI18n } from '@tanzlate/vue';
 
-So far it only works with a simple tag wrapping text (`<NuxtLink>Wilkommen zurück</NuxtLink>`)
-
-As we also have the issue of not being able to render multiple nodes in Vue 2 (it's possible in Vue 3)
-![image](https://github.com/reteach/reteach-app/assets/72502545/4381bbca-9bda-4490-9e6c-a9fbbf87e118)
-Meaning that we would have to wrap everything inside an extra `div` or `span` 😬
-
-Seeing https://github.com/vuejs/vue/issues/7088, it seems doable using a functional component though
-
-Here is the working test:
-
-| DE                                                                                                        | EN                                                                                                        |
-| --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| <img src="https://github.com/reteach/reteach-app/assets/72502545/aa9c70d5-eaed-4db9-9ba6-341087dfe974" /> | <img src="https://github.com/reteach/reteach-app/assets/72502545/947ff91e-4633-4ef2-baa0-606f70d51515" /> |
-
-I resumed a part of all this in the following ticket https://www.notion.so/reteach/Implement-the-solution-to-extract-Vue-components-tags-from-translation-key-values-11afafe5860b4561967d38dd3c7ce26e?pvs=4 which I directly inserted into the sprint and estimated at 8, hope you're fine with it 😄
-
-This template should help get you started developing with Vue 3 in Vite.
-
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-pnpm install
+const { tanz } = useI18n('home');
+</script>
 ```
 
-### Compile and Hot-Reload for Development
+Register any PascalCase component once, then pass only its props per usage:
 
-```sh
-pnpm dev
+```ts
+import { registerComponent } from '@tanzlate/vue';
+registerComponent('UserBadge', UserBadge);
 ```
 
-### Type-Check, Compile and Minify for Production
+Lowercase HTML tags (`<a>`, `<b>`, `<strong>`) need no registration. Use `UserBadge-1`, `-2`… to
+place the same component several times in one string with different props.
 
-```sh
-pnpm build
-```
+`tanz()` returns a plain string — any value containing tags has to go through `<Tanzlate>`.
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+## Exports
 
-```sh
-pnpm test:unit
-```
+| Export              | What it is                                                           |
+| ------------------- | -------------------------------------------------------------------- |
+| `I18nProvider`      | Provides the i18n context. Takes `i18next-config` or `i18n-context`. |
+| `useI18n(ns)`       | `{ tanz, globalT, lang, changeLanguage, i18nApp }` scoped to `ns`.   |
+| `<Tanzlate>`        | Renders a translation whose value contains tags.                     |
+| `registerComponent` | Maps a tag name to a component, app-wide.                            |
 
-### Run End-to-End Tests with [Playwright](https://playwright.dev)
+## Documentation
 
-```sh
-# Install browsers for the first run
-npx playwright install
+[Getting started](https://github.com/tanzlate/tanzlate/blob/main/docs/guide/getting-started.md) ·
+[Vue API](https://github.com/tanzlate/tanzlate/blob/main/docs/vue/api.md) ·
+[Component interpolation](https://github.com/tanzlate/tanzlate/blob/main/docs/vue/components-interpolation.md)
 
-# When testing on CI, must build the project first
-pnpm build
-
-# Runs the end-to-end tests
-pnpm test:e2e
-# Runs the tests only on Chromium
-pnpm test:e2e --project=chromium
-# Runs the tests of a specific file
-pnpm test:e2e tests/example.spec.ts
-# Runs the tests in debug mode
-pnpm test:e2e --debug
-```
+MIT © Arthur Plazanet
