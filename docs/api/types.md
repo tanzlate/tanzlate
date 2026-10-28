@@ -20,7 +20,8 @@ type Createi18nConfigParams = {
   resources?: Resource;
   debug?: boolean;
   initImmediate?: boolean;
-  backend?: FsBackendOptions;
+  modules?: I18nextModule[];
+  backend?: InitOptions['backend'];
 };
 ```
 
@@ -32,7 +33,12 @@ type Createi18nConfigParams = {
 - `supportedLanguages`: Array of supported languages (maps to i18next `supportedLngs`).
 - `resources`: Optional inline resources object.
 - `debug`: Enable i18next debug logging.
-- `backend`: Optional `i18next-fs-backend` options (Node.js only).
+- `modules`: i18next plugins to register before init, e.g. `[FsBackend]` on a server or
+  `[HttpBackend]` in a browser. You pass the backend yourself so that `@tanzlate/vanilla` never
+  imports one — a dynamic `import()` inside the package would be followed by bundlers regardless
+  of any runtime guard, pulling Node's `fs` into browser builds.
+- `backend`: Options for whichever backend you registered via `modules`, passed through to i18next
+  untouched. Supplying `backend` without `modules` throws.
 
 ## CoreContext
 
@@ -41,7 +47,7 @@ The context object returned by `useCoreContext`.
 ```ts
 interface CoreContext {
   i18nApp: I18nApp;
-  composeHelper: (ns: string) => TFunc;
+  composeHelper: (context: string) => TFunc;
   lang: (lng?: string) => Promise<void>;
   onLangChange: (callback: (lng: string) => void) => () => void;
 }
@@ -50,7 +56,7 @@ interface CoreContext {
 ### Properties
 
 - `i18nApp`: The underlying i18next instance.
-- `composeHelper`: Returns a scoped translation function for a given namespace.
+- `composeHelper`: Returns a translation function scoped to a context (the second key level).
 - `lang`: Change the active language.
 - `onLangChange`: Subscribe to language changes. Returns an unsubscribe function.
 

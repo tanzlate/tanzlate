@@ -11,11 +11,9 @@
   },
   "dependencies": {
     "@tanzlate/core": "workspace:*",
-    "i18next": "25.8.0",
-    "i18next-fs-backend": "2.6.0"
+    "i18next": "25.10.10"
   },
   "devDependencies": {
-    "@use-compose/logger": "0.0.6",
     "happy-dom": "18.0.1",
     "typescript": "5.9.3",
     "vite": "7.2.6",

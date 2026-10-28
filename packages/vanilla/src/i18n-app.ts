@@ -1,4 +1,3 @@
-import { useLogger } from '@use-compose/logger';
 // import { i18n } from "i18next";
 
 import { createInstance, InitOptions } from 'i18next';
@@ -48,7 +47,6 @@ function toInitOptions(cfg: Createi18nConfigParams): InitOptions {
  * @returns {I18nApp}
  */
 function createI18nAppInstance(): I18nApp {
-  const { log } = useLogger('createI18nAppInstance');
   // 1. create a base instance
   const base = createInstance();
   // const options = configureOptions(config);
@@ -59,11 +57,6 @@ function createI18nAppInstance(): I18nApp {
     async initTanz(this: I18nApp, cfg: Createi18nConfigParams): Promise<I18nApp> {
       await originalInit.call(this, toInitOptions(cfg));
       return this;
-    },
-
-    missingTranslationHandler(this: I18nApp, key: string) {
-      const { language, exists } = this;
-      log(`missingTranslationHandler called - ${language}, exists: ${exists(key)}`);
     },
   }) as I18nApp;
 

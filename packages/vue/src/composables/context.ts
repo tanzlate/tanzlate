@@ -25,7 +25,17 @@ export function setupI18nContext() {
 }
 
 export function useI18n(ns: string) {
-  const { ctx, lang } = inject(i18nKey)!;
+  const context = inject(i18nKey);
+
+  if (!context) {
+    throw new Error(
+      `[tanzlate] useI18n('${ns}') found no i18n context. Call it from a component ` +
+        'rendered inside <I18nProvider>, not from a parent or from outside setup(). ' +
+        'In a test, provide one directly: provide(i18nKey, { ctx, lang }).',
+    );
+  }
+
+  const { ctx, lang } = context;
   const helper = ctx.composeHelper(ns);
   const globalHelper = ctx.composeHelper('global');
 

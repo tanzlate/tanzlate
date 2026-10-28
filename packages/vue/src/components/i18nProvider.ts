@@ -1,5 +1,5 @@
 import { CoreContext, Createi18nConfigParams, useCoreContext } from '@tanzlate/vanilla';
-import { defineComponent, h, PropType, Suspense } from 'vue';
+import { defineComponent, h, PropType, Suspense, VNode } from 'vue';
 import { setupI18nContext } from '../composables/context';
 
 export default defineComponent({
@@ -14,7 +14,10 @@ export default defineComponent({
       required: false,
     },
   },
-  async setup(props, { slots }) {
+  // Deliberately not an `async setup`. Returning a promise only on the branch
+  // that actually awaits keeps the `i18n-context` path synchronous, so callers
+  // who already built their context do not need an outer <Suspense>.
+  setup(props, { slots }): (() => VNode) | Promise<() => VNode> {
     if (!props.i18nextConfig && !props.i18nContext) {
       throw new Error('[tanzlate] I18nProvider requires either i18next-config or i18n-context.');
     }
@@ -22,11 +25,16 @@ export default defineComponent({
     // provide + onUnmounted MUST happen before any await
     const resolve = setupI18nContext();
 
-    const ctx =
-      props.i18nContext ?? (await useCoreContext({ config: props.i18nextConfig!, ssr: false }));
+    const render = () => h(Suspense, () => h('div', { class: 'i18n-provider' }, slots.default?.()));
 
-    resolve(ctx);
+    if (props.i18nContext) {
+      resolve(props.i18nContext);
+      return render;
+    }
 
-    return () => h(Suspense, () => h('div', { class: 'i18n-provider' }, slots.default?.()));
+    return useCoreContext({ config: props.i18nextConfig!, ssr: false }).then((ctx) => {
+      resolve(ctx);
+      return render;
+    });
   },
 });

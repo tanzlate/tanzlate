@@ -1,35 +1,23 @@
 ---
-title: Getting Started (React)
+title: React (planned)
 titleTemplate: tanzlate
-description: Install and use the React renderer with the Trans component.
+description: Design sketch for a future React renderer. Not published.
 outline: [2, 3]
 ---
 
-# React Integration
+# React (planned)
 
-![NPM Package Version](https://img.shields.io/npm/v/@tanzlate/react?color=519ea9)
+::: danger Not published yet
+`@tanzlate/react` does **not exist on npm**. This page is a design sketch for a future package, kept
+here so the intended API is written down. `npm install @tanzlate/react` will fail.
 
-React integration for tanzlate, including [components interpolation](/react/components-interpolation).
-
-## Installation
-
-::: code-group
-
-```bash [npm]
-npm install @tanzlate/react
-```
-
-```bash [yarn]
-yarn add @tanzlate/react
-```
-
-```bash [pnpm]
-pnpm add @tanzlate/react
-```
-
+Only [`@tanzlate/vue`](/vue/) and [`@tanzlate/vanilla`](/vanilla/) are published today.
 :::
 
-## Usage
+Intended React integration for tanzlate, including
+[components interpolation](/react/components-interpolation).
+
+## Intended API
 
 ### `<I18nProvider>`
 
@@ -56,13 +44,12 @@ export default function App() {
 ```ts
 import { useI18n } from '@tanzlate/react';
 
-const { cT, globalT, forNamespace, lang, changeLanguage } = useI18n('my_namespace');
+const { tanz, globalT, lang, changeLanguage } = useI18n('home');
 ```
 
-| Return value     | Type                     | Description                                      |
-| ---------------- | ------------------------ | ------------------------------------------------ |
-| `cT`             | `cTFunc`                 | Translation helper scoped to the given namespace |
-| `globalT`        | `cTFunc`                 | Translation helper for the global namespace      |
-| `forNamespace`   | `(ns) => cTFunc`         | Factory to create a helper for any namespace     |
-| `lang`           | `string`                 | Current language                                 |
-| `changeLanguage` | `(lng) => Promise<void>` | Change the active language                       |
+| Return value     | Type                     | Description                                    |
+| ---------------- | ------------------------ | ---------------------------------------------- |
+| `tanz`           | `TFunc`                  | Translation helper scoped to the given context |
+| `globalT`        | `TFunc`                  | Translation helper for the `global` context    |
+| `lang`           | `string`                 | Current language                               |
+| `changeLanguage` | `(lng) => Promise<void>` | Change the active language                     |

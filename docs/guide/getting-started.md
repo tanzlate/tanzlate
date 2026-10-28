@@ -1,140 +1,177 @@
 ---
+title: Getting Started
+titleTemplate: tanzlate
+description: Install @tanzlate/vue and render your first translation with component interpolation.
 outline: [2, 3]
 order: 1
 ---
 
-# i18next-compose
+# Getting Started
 
-![NPM Package Version](https://img.shields.io/npm/v/i18next-compose?color=519ea9)
+![NPM Package Version](https://img.shields.io/npm/v/@tanzlate/vue?color=519ea9)
 
-A lightweight library to manage translations with **component interpolation** and **complex translation strings**
-
-## Motivation
-
-Translation is rarely just an engineering concern—it often involves multiple teams:
-
-- Developers implement the system.
-- Translators provide the content.
-- Designers ensure proper rendering.
-- Product Owners/Managers validate results.
-- Content Writers refine copy.
-
-i18next-compose provides a modular and efficient way to keep everyone aligned, without enforcing global `$t` helpers.
-
----
-
-Built with a generic **core** package and framework-specific renderers for **Vue** and **React**.
-
-::: tip Why?
-Translations often involve developers, translators, designers, and product owners.  
-This library keeps everyone aligned by making complex translations easier to manage.
-:::
-
-- [Vue →](/vue/)
-- [React →](/react/)
+This page gets a Vue 3 or Nuxt app rendering a translation string that contains real components.
+For the reasoning behind the library, see [Motivation](/motivation).
 
 ## Installation
 
 ::: code-group
 
 ```bash [npm]
-npm install i18next-compose
+npm install @tanzlate/vue
 ```
 
 ```bash [yarn]
-yarn add i18next-compose
+yarn add @tanzlate/vue
 ```
 
 ```bash [pnpm]
-pnpm add i18next-compose
+pnpm add @tanzlate/vue
 ```
 
 :::
 
-## Usage
+`@tanzlate/vue` pulls in `@tanzlate/vanilla` and `@tanzlate/core` itself — you don't install those
+separately. `vue` is a peer dependency (`^3.5.0`), so your app's copy is the one that gets used.
 
-There are different ways to use i18next-compose.
+Without a framework, install [`@tanzlate/vanilla`](/vanilla/) on its own.
 
-### Context Provider (recommended)
+## 1. Translation resources
 
-The best way is to create a context that will provide the i18next instance and the corresponding helper functions to your application.
+Keys are nested **namespace → context → key**. The namespace is set once in the config, the context
+is what you pass to `useI18n()`:
 
-::: code-group
-
-```js [JavaScript]
-import { composeI18nextContext } from 'i18next-compose';
-
-const i18nParams = {
-  namespace: 'my_namespace',
-  fallbackLng: 'en',
-  lng: 'en',
-  supportedLanguages: ['en', 'fr', 'de'],
-};
-const context = await composeI18nextContext(i18nParams);
+```json
+// locales/en.json
+{
+  "app_namespace": {
+    "home": {
+      "welcome": "Welcome to tanzlate with <LangSwitcher>switch language</LangSwitcher>",
+      "description": "A simple <b>example</b> of tanzlate in a Nuxt app"
+    }
+  }
+}
 ```
 
-```ts [TypeScript]
-import { composeI18nextContext } from 'i18next-compose';
-import type { Createi18nConfigParams, I18nextContext } from 'i18next-compose';
+## 2. Wrap the app in `I18nProvider`
 
-const i18nParams: Createi18nConfigParams = {
-  namespace: 'my_namespace',
-  fallbackLng: 'en',
+```vue
+<!-- app.vue -->
+<template>
+  <Suspense>
+    <I18nProvider :i18next-config="i18nConfig">
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </I18nProvider>
+  </Suspense>
+</template>
+
+<script setup lang="ts">
+import type { Createi18nConfigParams } from '@tanzlate/vanilla';
+import { I18nProvider } from '@tanzlate/vue';
+import DE_TRANSLATION from './i18n/locales/de.json';
+import EN_TRANSLATION from './i18n/locales/en.json';
+
+const i18nConfig: Createi18nConfigParams = {
+  namespace: 'app_namespace',
   lng: 'en',
-  supportedLanguages: ['en', 'fr', 'de'],
+  fallbackLng: 'en',
+  supportedLanguages: ['en', 'de'],
+  resources: {
+    en: EN_TRANSLATION,
+    de: DE_TRANSLATION,
+  },
 };
-
-// type will be inferred as I18nextContext but you can also explicitly type it
-const context: I18nextContext = await composeI18nextContext(i18nParams);
+</script>
 ```
 
+::: warning `I18nProvider` needs an outer `<Suspense>` here
+Given `i18next-config`, it awaits the i18next init, so the **parent** has to provide a `<Suspense>`
+boundary. (If you build the context yourself and pass `i18n-context` instead, it stays synchronous
+and needs no boundary.) It also renders a `<div class="i18n-provider">` around your children, which
+can matter for layout.
 :::
 
-### Standalone initialization
+## 3. Translate
 
-2. You can initialize the configuration in standalone mode:
+`useI18n(context)` returns `tanz`, the translation function for that context.
 
-::: code-group
+```vue
+<template>
+  <!-- plain string, no tags -->
+  <h1>{{ tanz('welcome') }}</h1>
 
-```js [JavaScript]
-import { i18nConfigInit } from 'i18next-compose';
+  <!-- tags in the string become real components -->
+  <Tanzlate :t-z="tanz" i18n-key="description" />
+</template>
 
-const i18nParams = {
-  namespace: 'my_namespace',
-  fallbackLng: 'en',
-  lng: 'en',
-  supportedLanguages: ['en', 'fr', 'de'],
-};
+<script setup lang="ts">
+import { Tanzlate, useI18n } from '@tanzlate/vue';
 
-const i18App = await i18nConfigInit(i18nParams);
-
-return i18App;
+const { tanz } = useI18n('home');
+</script>
 ```
 
-```ts [TypeScript]
-import { i18nConfigInit } from 'i18next-compose';
-import type { Createi18nConfigParams, I18nApp } from 'i18next-compose';
+::: tip `tanz()` vs `<Tanzlate>`
+`tanz()` returns a **plain string**. If the value contains tags, <code v-pre>{{ tanz('description') }}</code>
+prints them literally as text — that is correct behavior, not a bug. Any key whose value contains tags has
+to go through `<Tanzlate>`, which parses the string and builds the nodes.
+:::
 
-const i18nParams: Createi18nConfigParams = {
-  namespace: 'my_namespace',
-  fallbackLng: 'en',
-  lng: 'en',
-  supportedLanguages: ['en', 'fr', 'de'],
-};
+## 4. Interpolate components
 
-const i18App: I18nApp = await i18nConfigInit(i18nParams);
+Register a PascalCase component once, then pass only its props per usage:
+
+```ts
+import { registerComponent } from '@tanzlate/vue';
+import ColoredLabel from '~/components/ColoredLabel.vue';
+
+registerComponent('ColoredLabel', ColoredLabel);
 ```
 
-:::
-Behind the scenes, this will create a new i18next instance with the provided configuration. You can then use this instance to translate your content using the i18next helper functions.
+```vue
+<Tanzlate
+  :t-z="tanz"
+  i18n-key="componentInterpolationExample"
+  :components="{
+    ColoredLabel: { color: '#3178c6', label: 'Blue Label' },
+    'ColoredLabel-1': { color: labelColor, label: 'Red Label' },
+    a: { href: 'https://tanzlate.dev' },
+  }"
+/>
+```
 
-:::tip
-i18next-compose doest not inject global variable such as `$t` or `$i18next`. It means to be used in a modular way.
-:::
+Three things are happening there, and they are the heart of the library:
 
-2. You can directly create a context that will:
+- `registerComponent` resolves the tag — **once per app**, covering every string that uses it.
+- `:components` supplies **props only**, per usage. It never resolves a component.
+- The `-N` suffix lets one component appear several times in a string with different props.
 
-- Create the i18n instance (as in 1.)
-- Return the corresponding reactive helper functions (see features)
+Lowercase HTML tags (`<a>`, `<b>`, `<strong>`) need no registration.
 
-This context can then be used in different frameworks (Vue, React) as a provider.
+Full details in [Component Interpolation](/vue/components-interpolation) and
+[Component Registry](/vue/component-registry).
+
+## 5. Switch language
+
+```vue
+<script setup lang="ts">
+import { useI18n } from '@tanzlate/vue';
+
+const { lang, changeLanguage } = useI18n('home');
+</script>
+
+<template>
+  <button @click="changeLanguage(lang === 'en' ? 'de' : 'en')">
+    {{ lang }}
+  </button>
+</template>
+```
+
+`lang` is a `Ref<string>`, and translations re-render on change.
+
+## No global `$t`
+
+tanzlate does not install a global `$t` or `$i18next`. Every component asks for the context it
+needs via `useI18n()`, which keeps keys traceable to the component that uses them.
