@@ -33,7 +33,7 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     rollupOptions: {
-      external: ['i18next', 'i18next-fs-backend', '@tanzlate/core'],
+      external: ['i18next', '@tanzlate/core'],
     },
     // Optional: let modern features pass through if any remain
     target: 'esnext',
