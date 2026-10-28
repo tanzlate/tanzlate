@@ -14,6 +14,7 @@ type Createi18nConfigParams = Omit<InitOptions, 'backend' | 'resources'> & {
   namespace?: string | readonly string[] | InitOptions['ns'];
   /** Your alias for i18next's `supportedLngs` */
   supportedLanguages?: InitOptions['supportedLngs'];
+  // TODO: check comments
   /**
    * i18next plugins to register before init, e.g. `[FsBackend]` on a server or
    * `[HttpBackend]` in a browser.
